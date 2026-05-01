@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="VocabFlix">
+<meta name="theme-color" content="#E50914">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>VocabFlix</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E50914;
+  --dark: #0a0a0a;
+  --card: #141414;
+  --card2: #1e1e1e;
+  --card3: #252525;
+  --text: #f0f0f0;
+  --muted: #777;
+  --green: #46d369;
+  --yellow: #f5c518;
+  --orange: #ff6b35;
+  --border: #2a2a2a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, #000 0%, transparent 100%);
+  padding: 20px 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+}
+.logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--red); letter-spacing: 3px; }
+.logo span { color: #fff; }
+.header-badge { font-size: 11px; color: var(--muted); background: var(--card); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+
+/* ── BANNER ── */
+.quiz-banner {
+  display: none; background: linear-gradient(135deg, #2a0800, #1a0400);
+  border-bottom: 2px solid var(--red); padding: 12px 16px;
+  cursor: pointer;
+}
+.quiz-banner.visible { display: flex; align-items: center; gap: 10px; }
+.banner-text { flex: 1; }
+.banner-title { font-size: 13px; font-weight: 600; color: #fff; }
+.banner-sub { font-size: 11px; color: #ff9999; margin-top: 2px; }
+.banner-btn { background: var(--red); color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1px; cursor: pointer; }
+
+/* ── NAV ── */
+nav {
+  display: flex; background: #080808; border-bottom: 1px solid var(--border);
+  overflow-x: auto; scrollbar-width: none; position: sticky; top: 64px; z-index: 99;
+}
+nav::-webkit-scrollbar { display: none; }
+nav button {
+  flex: 1; min-width: 64px; padding: 12px 4px;
+  background: none; border: none; color: var(--muted);
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: color .2s; position: relative; white-space: nowrap;
+}
+nav button.active { color: #fff; }
+nav button.active::after {
+  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 2px; background: var(--red); border-radius: 2px;
+}
+.nav-badge {
+  display: inline-block; background: var(--red); color: #fff;
+  font-size: 9px; border-radius: 10px; padding: 1px 5px;
+  margin-left: 3px; vertical-align: middle;
+}
+
+/* ── PAGES ── */
+.page { display: none; padding: 16px 16px 100px; }
+.page.active { display: block; }
+
+/* ── CARDS ── */
+.card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); }
+.section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 18px 0 10px; }
+
+/* ── INPUT ── */
+input[type="text"], input[type="time"] {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
+  color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; padding: 13px 15px;
+  outline: none; transition: border-color .2s; width: 100%;
+}
+input[type="text"]:focus, input[type="time"]:focus { border-color: var(--red); }
+input[type="text"]::placeholder { color: #444; }
+
+.input-row { display: flex; gap: 10px; }
+.input-row input { flex: 1; }
+
+/* ── BUTTONS ── */
+.btn { border: none; border-radius: 8px; padding: 13px 18px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .2s; }
+.btn:active { opacity: .7; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-green { background: var(--green); color: #000; }
+.btn-gray { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+.btn-full { width: 100%; }
+.btn-bebas { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── PREVIEW ── */
+.preview-card {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin-top: 14px; animation: fadeIn .3s ease;
+}
+.preview-word { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; letter-spacing: 1px; line-height: 1; }
+.preview-pos { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.preview-meaning { font-size: 17px; color: var(--yellow); font-weight: 600; margin: 12px 0 8px; }
+.preview-example { font-size: 13px; color: #666; font-style: italic; line-height: 1.5; }
+.preview-actions { display: flex; gap: 10px; margin-top: 14px; }
+.preview-actions .btn { flex: 1; }
+
+/* ── WORD CARD ── */
+.word-item {
+  background: var(--card); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px; animation: fadeIn .3s ease;
+  border: 1px solid var(--border);
+}
+.word-item.danger { border-color: #3a1a1a; background: #180a0a; }
+.word-main { flex: 1; min-width: 0; }
+.word-en { font-size: 17px; font-weight: 600; color: #fff; }
+.word-ko { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.word-ex { font-size: 11px; color: #444; margin-top: 3px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: var(--card2); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.badge.wrong { background: #2a0800; color: var(--orange); }
+.badge.danger { background: #3a0000; color: #ff4444; }
+.del-btn { background: none; border: none; color: #333; font-size: 16px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+.del-btn:active { color: var(--red); }
+
+/* ── STATS ── */
+.stats-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.stat-box { flex: 1; background: var(--card); border-radius: 10px; padding: 14px 8px; text-align: center; border: 1px solid var(--border); }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1; color: var(--red); }
+.stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+/* ── QUIZ ── */
+.quiz-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 10px; }
+.quiz-progress { width: 100%; margin-bottom: 20px; }
+.progress-bar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--red); border-radius: 3px; transition: width .4s ease; }
+.progress-label { font-size: 11px; color: var(--muted); text-align: right; margin-top: 5px; }
+
+.quiz-card {
+  width: 100%; background: var(--card); border-radius: 16px; padding: 32px 24px;
+  text-align: center; margin-bottom: 20px; position: relative; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.quiz-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--red); }
+.quiz-type-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+.quiz-prompt { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: #fff; letter-spacing: 2px; line-height: 1; }
+.quiz-prompt.ko { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500; letter-spacing: 0; }
+.quiz-pos { font-size: 11px; color: #444; margin-top: 6px; }
+.quiz-hint { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+.quiz-input-wrap { width: 100%; margin-bottom: 14px; }
+.quiz-input-wrap input { text-align: center; font-size: 17px; }
+
+.quiz-result { width: 100%; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 14px; animation: fadeIn .3s ease; }
+.quiz-result.correct { background: #081a08; border: 1px solid #1a4a1a; }
+.quiz-result.wrong { background: #1a0808; border: 1px solid #4a1a1a; }
+.result-icon { font-size: 28px; margin-bottom: 6px; }
+.result-word { font-size: 20px; font-weight: 700; }
+.result-sub { font-size: 13px; color: var(--muted); margin-top: 5px; }
+
+.btn-row { display: flex; gap: 10px; width: 100%; }
+.btn-row .btn { flex: 1; }
+
+.no-quiz { text-align: center; padding: 60px 20px; }
+.no-quiz .icon { font-size: 52px; margin-bottom: 16px; }
+.no-quiz h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.no-quiz p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+/* ── WRONG WORDS ── */
+.wrong-header {
+  background: linear-gradient(135deg, #1a0500, #0a0000);
+  border: 1px solid #3a1a00; border-radius: 12px; padding: 16px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.wrong-icon { font-size: 32px; }
+.wrong-info h3 { font-size: 15px; font-weight: 600; }
+.wrong-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── SETTINGS ── */
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; font-weight: 500; }
+.setting-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ── BACKUP ── */
+.backup-row { display: flex; gap: 10px; }
+.backup-row .btn { flex: 1; font-size: 13px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #222; color: #fff; padding: 11px 20px; border-radius: 8px;
+  font-size: 13px; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; pointer-events: none;
+  border: 1px solid var(--border);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── LOADING ── */
+.loading-dots::after { content: ''; animation: dots 1.2s infinite; }
+@keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
+@keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
+
+.empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">VOCAB<span>FLiX</span></div>
+  <div class="header-badge" id="due-badge"></div>
+</header>
+
+<div class="quiz-banner" id="quiz-banner" onclick="goToQuiz()">
+  <div style="font-size:22px">🔔</div>
+  <div class="banner-text">
+    <div class="banner-title">복습할 단어가 있어요!</div>
+    <div class="banner-sub" id="banner-sub">퀴즈를 풀어보세요</div>
+  </div>
+  <button class="banner-btn">풀기</button>
+</div>
+
+<nav>
+  <button class="active" id="nav-add" onclick="showPage('add',this)">➕ 추가</button>
+  <button id="nav-quiz" onclick="showPage('quiz',this)">🎯 퀴즈</button>
+  <button id="nav-words" onclick="showPage('words',this)">📚 단어장</button>
+  <button id="nav-wrong" onclick="showPage('wrong',this)">❌ 오답<span class="nav-badge" id="wrong-badge" style="display:none"></span></button>
+  <button id="nav-settings" onclick="showPage('settings',this)">⚙️ 설정</button>
+</nav>
+
+<!-- ADD PAGE -->
+<div id="page-add" class="page active">
+  <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">영어 단어 검색</div>
+    <div class="input-row">
+      <input type="text" id="word-input" placeholder="단어 입력 (예: resilient)" onkeydown="if(event.key==='Enter')searchWord()">
+      <button class="btn btn-red btn-bebas" onclick="searchWord()" id="search-btn" style="white-space:nowrap;padding:13px 20px">검색</button>
+    </div>
+    <div id="preview-area"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="s-total">0</div><div class="stat-label">저장 단어</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-due" style="color:var(--yellow)">0</div><div class="stat-label">오늘 퀴즈</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-wrong" style="color:var(--orange)">0</div><div class="stat-label">오답 단어</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-done" style="color:var(--green)">0</div><div class="stat-label">완료</div></div>
+  </div>
+
+  <div class="section-title">최근 저장 단어</div>
+  <div id="recent-list"></div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div id="page-quiz" class="page">
+  <div id="quiz-container"></div>
+</div>
+
+<!-- WORDS PAGE -->
+<div id="page-words" class="page">
+  <div id="words-container"></div>
+</div>
+
+<!-- WRONG PAGE -->
+<div id="page-wrong" class="page">
+  <div id="wrong-container"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">알림 설정</div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">매일 퀴즈 알림</div>
+        <div class="setting-sub">설정한 시간에 알림을 받아요</div>
+      </div>
+      <input type="time" id="notif-time" value="12:20" style="width:120px" onchange="saveNotifTime()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">미완료 재알림</div>
+        <div class="setting-sub">퀴즈 미완료시 2시간마다 배너</div>
+      </div>
+      <span style="font-size:12px;color:var(--green)">활성</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">복습 스케줄</div>
+    <div style="font-size:13px;color:var(--muted);line-height:2">
+      📖 +1일 — 뜻 보고 단어 맞추기<br>
+      ✏️ +2일 — 단어 보고 뜻 맞추기<br>
+      📖 +4일 — 뜻 보고 단어 맞추기<br>
+      ✏️ +7일 — 단어 보고 뜻 맞추기<br>
+      🎯 +14일 — 랜덤 혼합<br>
+      <br>
+      <span style="color:var(--orange)">❌ 틀릴수록 출제 빈도 증가</span><br>
+      <span style="color:#ff4444">⚠️ 5회 이상 틀리면 오답 단어장 등록</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">💾 데이터 백업</div>
+    <div class="backup-row">
+      <button class="btn btn-gray" onclick="exportData()">📤 내보내기</button>
+      <label class="btn btn-gray" style="cursor:pointer;text-align:center">
+        📥 불러오기
+        <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+      </label>
+    </div>
+    <div style="font-size:11px;color:#333;margin-top:10px;line-height:1.5">정기적으로 백업해두면 폰을 바꿔도 복원할 수 있어요.</div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">위험 구역</div>
+    <button class="btn btn-gray btn-full" onclick="resetAll()" style="color:#ff4444;border-color:#3a0000">전체 데이터 초기화</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// IndexedDB
+// ═══════════════════════════════════════
+const DB_NAME = 'vocabflix_v3';
+const DB_VER = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('words')) d.createObjectStore('words', { keyPath: 'id' });
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(); };
+    req.onerror = reject;
+  });
+}
+const tx = (store, mode='readonly') => db.transaction(store, mode).objectStore(store);
+const dbGetAll = () => new Promise((res,rej) => { const r = tx('words').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=rej; });
+const dbPut = w => new Promise((res,rej) => { const r = tx('words','readwrite').put(w); r.onsuccess=res; r.onerror=rej; });
+const dbDel = id => new Promise((res,rej) => { const r = tx('words','readwrite').delete(id); r.onsuccess=res; r.onerror=rej; });
+const loadWords = async () => (await dbGetAll()).sort((a,b) => b.addedAt - a.addedAt);
+
+// ═══════════════════════════════════════
+// SCHEDULE & DUE LOGIC
+// ═══════════════════════════════════════
+// Base intervals in days
+const BASE_INTERVALS = [1, 2, 4, 7, 14];
+
+function getNextDue(word) {
+  // Wrong count increases frequency: extra reviews every floor(wrongCount/2) days
+  const wrongBonus = Math.floor((word.wrongCount || 0) / 2);
+  const completedCount = (word.completedSteps || []).length;
+  if (completedCount >= BASE_INTERVALS.length) return null; // fully done
+
+  const interval = Math.max(1, BASE_INTERVALS[completedCount] - wrongBonus);
+  return word.addedAt + interval * 86400000;
+}
+
+async function getDueItems() {
+  const words = await loadWords();
+  const due = [];
+  const now = Date.now();
+  words.forEach(w => {
+    const nextDue = getNextDue(w);
+    if (nextDue && now >= nextDue) {
+      // Determine quiz type
+      const completedCount = (w.completedSteps || []).length;
+      let type;
+      if (completedCount === 4) type = Math.random() > .5 ? 'en_to_ko' : 'ko_to_en';
+      else type = completedCount % 2 === 0 ? 'ko_to_en' : 'en_to_ko';
+
+      // Weight by wrong count: add extra copies
+      const weight = 1 + Math.floor((w.wrongCount || 0) / 2);
+      for (let i = 0; i < weight; i++) due.push({ word: w, type });
+    }
+  });
+  // Shuffle
+  for (let i = due.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [due[i], due[j]] = [due[j], due[i]];
+  }
+  return due;
+}
+
+// Build quiz pool: 10 en→ko + 10 ko→en, weighted by wrong count
+async function buildQuizPool() {
+  const due = await getDueItems();
+  const enToKo = due.filter(d => d.type === 'en_to_ko').slice(0, 10);
+  const koToEn = due.filter(d => d.type === 'ko_to_en').slice(0, 10);
+  // Interleave
+  const pool = [];
+  const max = Math.max(enToKo.length, koToEn.length);
+  for (let i = 0; i < max; i++) {
+    if (i < enToKo.length) pool.push(enToKo[i]);
+    if (i < koToEn.length) pool.push(koToEn[i]);
+  }
+  return pool;
+}
+
+// ═══════════════════════════════════════
+// MYMEMORY TRANSLATION API
+// ═══════════════════════════════════════
+async function translateWord(word) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ko`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.responseStatus !== 200) throw new Error('Translation failed');
+  const ko = data.responseData.translatedText;
+
+  // Also get English definition
+  let example = '';
+  try {
+    const defRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    const defData = await defRes.json();
+    if (Array.isArray(defData) && defData[0]) {
+      const meanings = defData[0].meanings;
+      if (meanings && meanings[0] && meanings[0].definitions && meanings[0].definitions[0]) {
+        example = meanings[0].definitions[0].example || meanings[0].definitions[0].definition || '';
+        example = example.slice(0, 80);
+      }
+    }
+  } catch(e) {}
+
+  return {
+    word: word.toLowerCase().trim(),
+    meaning_ko: ko,
+    pos: '',
+    example: example
+  };
+}
+
+// ═══════════════════════════════════════
+// SEARCH & PREVIEW
+// ═══════════════════════════════════════
+let pendingWord = null;
+
+async function searchWord() {
+  const input = document.getElementById('word-input');
+  const btn = document.getElementById('search-btn');
+  const previewArea = document.getElementById('preview-area');
+  const word = input.value.trim();
+  if (!word) return;
+
+  const words = await loadWords();
+  if (words.find(w => w.word.toLowerCase() === word.toLowerCase())) {
+    showToast('이미 저장된 단어예요!'); return;
+  }
+
+  btn.disabled = true; btn.textContent = '...';
+  previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--muted)"><span class="loading-dots">번역 중</span></div>`;
+
+  try {
+    const info = await translateWord(word);
+    pendingWord = {
+      id: Date.now(),
+      word: info.word,
+      meaning_ko: info.meaning_ko,
+      pos: info.pos,
+      example: info.example,
+      addedAt: Date.now(),
+      completedSteps: [],
+      wrongCount: 0,
+      lastWrongAt: null
+    };
+
+    previewArea.innerHTML = `
+      <div class="preview-card">
+        <div class="preview-word">${pendingWord.word}</div>
+        <div class="preview-meaning">${pendingWord.meaning_ko}</div>
+        ${pendingWord.example ? `<div class="preview-example">"${pendingWord.example}"</div>` : ''}
+        <div class="preview-actions">
+          <button class="btn btn-green btn-bebas" onclick="confirmAdd()">✓ 단어장 추가</button>
+          <button class="btn btn-gray" onclick="cancelAdd()">추가 안 함</button>
+        </div>
+      </div>`;
+  } catch(e) {
+    previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--red)">검색 실패. 영어 단어인지 확인해주세요.</div>`;
+  }
+  btn.disabled = false; btn.textContent = '검색';
+}
+
+async function confirmAdd() {
+  if (!pendingWord) return;
+  await dbPut(pendingWord);
+  pendingWord = null;
+  document.getElementById('word-input').value = '';
+  document.getElementById('preview-area').innerHTML = '';
+  showToast('단어장에 추가됐어요 ✓');
+  await refreshAll();
+}
+
+function cancelAdd() {
+  pendingWord = null;
+  document.getElementById('word-input').value = '';
+  document.getElementById('preview-area').innerHTML = '';
+  showToast('추가하지 않았어요');
+}
+
+// ═══════════════════════════════════════
+// STATS & RECENT
+// ═══════════════════════════════════════
+async function updateStats() {
+  const words = await loadWords();
+  const due = await getDueItems();
+  const dueUniq = [...new Set(due.map(d => d.word.id))].length;
+  const wrongWords = words.filter(w => (w.wrongCount || 0) >= 5);
+  const done = words.filter(w => (w.completedSteps||[]).length >= BASE_INTERVALS.length);
+
+  document.getElementById('s-total').textContent = words.length;
+  document.getElementById('s-due').textContent = dueUniq;
+  document.getElementById('s-wrong').textContent = wrongWords.length;
+  document.getElementById('s-done').textContent = done.length;
+
+  const dueBadge = document.getElementById('due-badge');
+  dueBadge.textContent = dueUniq > 0 ? `🔔 퀴즈 ${dueUniq}개` : '';
+
+  const wrongBadge = document.getElementById('wrong-badge');
+  if (wrongWords.length > 0) {
+    wrongBadge.textContent = wrongWords.length;
+    wrongBadge.style.display = 'inline-block';
+  } else {
+    wrongBadge.style.display = 'none';
+  }
+}
+
+async function renderRecent() {
+  const words = (await loadWords()).slice(0, 5);
+  const el = document.getElementById('recent-list');
+  if (!words.length) { el.innerHTML = '<div class="empty">아직 저장된 단어가 없어요<br>첫 단어를 추가해보세요!</div>'; return; }
+  el.innerHTML = words.map(w => `
+    <div class="word-item">
+      <div class="word-main">
+        <div class="word-en">${w.word}</div>
+        <div class="word-ko">${w.meaning_ko}</div>
+      </div>
+      ${(w.wrongCount||0) > 0 ? `<span class="badge wrong">오답 ${w.wrongCount}회</span>` : ''}
+      <span class="badge">${new Date(w.addedAt).toLocaleDateString('ko')}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+let quizPool = [];
+let quizIndex = 0;
+let quizAnswered = false;
+let quizSessionDone = false;
+
+async function renderQuiz() {
+  if (quizIndex === 0) {
+    quizPool = await buildQuizPool();
+  }
+  const container = document.getElementById('quiz-container');
+
+  if (!quizPool.length) {
+    container.innerHTML = `
+      <div class="no-quiz">
+        <div class="icon">🎬</div>
+        <h3>오늘 퀴즈 없음!</h3>
+        <p>단어를 추가하면 다음 날부터<br>퀴즈가 자동으로 생성돼요.</p>
+      </div>`; return;
+  }
+
+  if (quizIndex >= quizPool.length) {
+    quizSessionDone = true;
+    localStorage.setItem('vf_quiz_done', new Date().toDateString());
+    hideBanner();
+    container.innerHTML = `
+      <div class="no-quiz">
+        <div class="icon">🏆</div>
+        <h3>오늘 복습 완료!</h3>
+        <p>총 ${quizPool.length}문제를 풀었어요.<br>내일 또 만나요!</p>
+        <button class="btn btn-red btn-full" style="margin-top:20px" onclick="quizIndex=0;renderQuiz()">다시 풀기</button>
+      </div>`; return;
+  }
+
+  const item = quizPool[quizIndex];
+  const w = item.word;
+  const type = item.type;
+  quizAnswered = false;
+  const pct = Math.round((quizIndex / quizPool.length) * 100);
+
+  container.innerHTML = `
+    <div class="quiz-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-label">${quizIndex + 1} / ${quizPool.length}</div>
+    </div>
+    <div class="quiz-wrap">
+      <div class="quiz-card">
+        <div class="quiz-type-label">${type === 'en_to_ko' ? '🇺🇸 단어 → 🇰🇷 뜻' : '🇰🇷 뜻 → 🇺🇸 단어'}</div>
+        <div class="quiz-prompt ${type === 'ko_to_en' ? 'ko' : ''}">${type === 'en_to_ko' ? w.word : w.meaning_ko}</div>
+        ${type === 'en_to_ko' && w.pos ? `<div class="quiz-pos">${w.pos}</div>` : ''}
+        ${(w.wrongCount||0) >= 3 ? `<div class="quiz-hint">⚠️ 자주 틀리는 단어예요</div>` : ''}
+      </div>
+      <div class="quiz-input-wrap">
+        <input type="text" id="quiz-ans" placeholder="${type === 'en_to_ko' ? '한국어 뜻 입력...' : '영어 단어 입력...'}" onkeydown="if(event.key==='Enter')checkAnswer()" autocomplete="off" autocorrect="off" autocapitalize="off">
+      </div>
+      <div id="result-area"></div>
+      <div class="btn-row">
+        <button class="btn btn-gray btn-bebas" onclick="skipQuiz()">모르겠어요</button>
+        <button class="btn btn-red btn-bebas" id="quiz-btn" onclick="checkAnswer()">확인</button>
+      </div>
+    </div>`;
+
+  setTimeout(() => { const i = document.getElementById('quiz-ans'); if(i) i.focus(); }, 100);
+}
+
+async function checkAnswer() {
+  if (quizAnswered) { quizIndex++; renderQuiz(); return; }
+  const item = quizPool[quizIndex];
+  const w = item.word; const type = item.type;
+  const ansEl = document.getElementById('quiz-ans');
+  const userAns = (ansEl?.value || '').trim().toLowerCase();
+  if (!userAns) return;
+
+  quizAnswered = true;
+  if (ansEl) ansEl.disabled = true;
+
+  const correctRaw = type === 'en_to_ko' ? w.meaning_ko : w.word;
+  const correct = correctRaw.toLowerCase();
+  const tokens = correct.split(/[\s,\/·\(\)]+/).filter(t => t.length > 1);
+  const isCorrect = tokens.some(t => userAns.includes(t)) || userAns === correct;
+
+  const resultArea = document.getElementById('result-area');
+  const btn = document.getElementById('quiz-btn');
+
+  if (isCorrect) {
+    resultArea.innerHTML = `
+      <div class="quiz-result correct">
+        <div class="result-icon">✅</div>
+        <div class="result-word">${correctRaw}</div>
+        ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
+      </div>`;
+    // Mark step done
+    const words = await loadWords();
+    const word = words.find(x => x.id === w.id);
+    if (word) {
+      if (!word.completedSteps) word.completedSteps = [];
+      word.completedSteps.push(word.completedSteps.length);
+      await dbPut(word);
+    }
+    showToast('정답! 🎉');
+  } else {
+    resultArea.innerHTML = `
+      <div class="quiz-result wrong">
+        <div class="result-icon">❌</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
+        <div class="result-word">${correctRaw}</div>
+        ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
+      </div>`;
+    // Increment wrong count
+    const words = await loadWords();
+    const word = words.find(x => x.id === w.id);
+    if (word) {
+      word.wrongCount = (word.wrongCount || 0) + 1;
+      word.lastWrongAt = Date.now();
+      await dbPut(word);
+      if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
+    }
+    showToast('다음엔 맞을 수 있어요!');
+  }
+
+  if (btn) btn.textContent = '다음 →';
+  await updateStats();
+}
+
+async function skipQuiz() {
+  if (quizAnswered) { quizIndex++; renderQuiz(); return; }
+  const item = quizPool[quizIndex];
+  const correctRaw = item.type === 'en_to_ko' ? item.word.meaning_ko : item.word.word;
+  quizAnswered = true;
+
+  document.getElementById('result-area').innerHTML = `
+    <div class="quiz-result wrong">
+      <div class="result-icon">💡</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
+      <div class="result-word">${correctRaw}</div>
+    </div>`;
+  document.getElementById('quiz-btn').textContent = '다음 →';
+  const ansEl = document.getElementById('quiz-ans');
+  if (ansEl) ansEl.disabled = true;
+
+  // Count as wrong
+  const words = await loadWords();
+  const word = words.find(x => x.id === item.word.id);
+  if (word) {
+    word.wrongCount = (word.wrongCount || 0) + 1;
+    word.lastWrongAt = Date.now();
+    await dbPut(word);
+    if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
+  }
+  await updateStats();
+}
+
+// ═══════════════════════════════════════
+// WORD LIST
+// ═══════════════════════════════════════
+async function renderWords() {
+  const words = await loadWords();
+  const container = document.getElementById('words-container');
+  if (!words.length) { container.innerHTML = '<div class="empty">저장된 단어가 없어요</div>'; return; }
+
+  const due = await getDueItems();
+  const dueIds = new Set(due.map(d => d.word.id));
+
+  container.innerHTML = `<div class="section-title">${words.length}개 단어</div>` +
+    words.map(w => {
+      const wc = w.wrongCount || 0;
+      const isDanger = wc >= 5;
+      const isDue = dueIds.has(w.id);
+      const allDone = (w.completedSteps||[]).length >= BASE_INTERVALS.length;
+      const badge = allDone ? '<span class="badge" style="color:var(--green);background:#081a08">완료 ✓</span>'
+        : isDue ? '<span class="badge" style="color:var(--yellow);background:#1a1400">복습 !</span>'
+        : '<span class="badge">대기</span>';
+      return `
+        <div class="word-item ${isDanger?'danger':''}">
+          <div class="word-main">
+            <div class="word-en">${w.word} ${isDanger?'⚠️':''}</div>
+            <div class="word-ko">${w.meaning_ko}</div>
+            ${w.example?`<div class="word-ex">${w.example}</div>`:''}
+          </div>
+          ${wc > 0 ? `<span class="badge ${isDanger?'danger':'wrong'}">${isDanger?'오답5+':'오답'+wc}</span>` : ''}
+          ${badge}
+          <button class="del-btn" onclick="deleteWord(${w.id})">✕</button>
+        </div>`;
+    }).join('');
+}
+
+async function deleteWord(id) {
+  if (!confirm('단어를 삭제할까요?')) return;
+  await dbDel(id);
+  await renderWords();
+  await refreshAll();
+  showToast('삭제됐어요');
+}
+
+// ═══════════════════════════════════════
+// WRONG WORDS PAGE
+// ═══════════════════════════════════════
+async function renderWrong() {
+  const words = await loadWords();
+  const wrong = words.filter(w => (w.wrongCount||0) >= 5).sort((a,b) => (b.wrongCount||0) - (a.wrongCount||0));
+  const container = document.getElementById('wrong-container');
+
+  container.innerHTML = `
+    <div class="wrong-header">
+      <div class="wrong-icon">❌</div>
+      <div class="wrong-info">
+        <h3>오답 단어장</h3>
+        <p>5회 이상 틀린 단어 ${wrong.length}개</p>
+      </div>
+    </div>`;
+
+  if (!wrong.length) {
+    container.innerHTML += '<div class="empty">오답 단어가 없어요!<br>계속 잘 하고 있어요 🎉</div>';
+    return;
+  }
+
+  container.innerHTML += wrong.map(w => `
+    <div class="word-item danger">
+      <div class="word-main">
+        <div class="word-en">${w.word}</div>
+        <div class="word-ko">${w.meaning_ko}</div>
+        ${w.example?`<div class="word-ex">${w.example}</div>`:''}
+      </div>
+      <span class="badge danger">오답 ${w.wrongCount}회</span>
+      <button class="del-btn" onclick="deleteWord(${w.id})">✕</button>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// BANNER & REMINDER
+// ═══════════════════════════════════════
+async function checkBanner() {
+  const now = new Date();
+  const notifTime = localStorage.getItem('vf_notif_time') || '12:20';
+  const [h, m] = notifTime.split(':').map(Number);
+  const notifMinutes = h * 60 + m;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  if (nowMinutes < notifMinutes) { hideBanner(); return; }
+
+  // Check if quiz done today
+  const doneDateStr = localStorage.getItem('vf_quiz_done');
+  if (doneDateStr === now.toDateString()) { hideBanner(); return; }
+
+  const due = await getDueItems();
+  if (!due.length) { hideBanner(); return; }
+
+  const lastDismiss = parseInt(localStorage.getItem('vf_banner_dismiss') || '0');
+  if (Date.now() - lastDismiss < 2 * 60 * 60 * 1000) { hideBanner(); return; }
+
+  document.getElementById('banner-sub').textContent = `미완료 퀴즈 ${[...new Set(due.map(d=>d.word.id))].length}개`;
+  document.getElementById('quiz-banner').classList.add('visible');
+}
+
+function hideBanner() { document.getElementById('quiz-banner').classList.remove('visible'); }
+
+function goToQuiz() {
+  localStorage.setItem('vf_banner_dismiss', Date.now().toString());
+  hideBanner();
+  quizIndex = 0;
+  showPage('quiz', document.getElementById('nav-quiz'));
+}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function saveNotifTime() {
+  const t = document.getElementById('notif-time').value;
+  localStorage.setItem('vf_notif_time', t);
+  showToast(`알림 시간이 ${t}으로 설정됐어요`);
+}
+
+// ═══════════════════════════════════════
+// BACKUP
+// ═══════════════════════════════════════
+async function exportData() {
+  const words = await loadWords();
+  if (!words.length) { showToast('저장된 단어가 없어요'); return; }
+  const json = JSON.stringify({ version: 3, exportedAt: new Date().toISOString(), words }, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  a.download = `vocabflix_${new Date().toLocaleDateString('ko').replace(/\./g,'-').trim()}.json`;
+  a.click();
+  showToast(`${words.length}개 단어 내보내기 완료!`);
+}
+
+async function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    const words = data.words || data;
+    let added = 0;
+    for (const w of words) { if (w.id && w.word) { await dbPut(w); added++; } }
+    await refreshAll();
+    showToast(`${added}개 단어 불러오기 완료!`);
+  } catch { showToast('파일 형식이 올바르지 않아요'); }
+  e.target.value = '';
+}
+
+async function resetAll() {
+  if (!confirm('정말 모든 데이터를 삭제할까요?')) return;
+  const words = await loadWords();
+  for (const w of words) await dbDel(w.id);
+  await refreshAll();
+  showToast('초기화됐어요');
+}
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  if (name === 'quiz') { quizIndex = 0; renderQuiz(); }
+  if (name === 'words') renderWords();
+  if (name === 'wrong') renderWrong();
+  if (name === 'settings') {
+    const saved = localStorage.getItem('vf_notif_time') || '12:20';
+    document.getElementById('notif-time').value = saved;
+  }
+  updateStats();
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ═══════════════════════════════════════
+// REFRESH ALL
+// ═══════════════════════════════════════
+async function refreshAll() {
+  await updateStats();
+  await renderRecent();
+  await checkBanner();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init() {
+  await openDB();
+  await refreshAll();
+  // Check banner every 5 min
+  setInterval(checkBanner, 5 * 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>
