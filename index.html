@@ -296,7 +296,19 @@ input[type="text"]::placeholder { color: #444; }
   </div>
 
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">복습 스케줄</div>
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔔 진짜 푸시 알림 설정 (iOS 단축어)</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.9">
+      앱이 꺼져 있어도 알림을 받으려면 아이폰 <strong style="color:#fff">단축어</strong> 앱을 사용하세요.<br><br>
+      <span style="color:var(--yellow)">① 단축어 앱 열기</span><br>
+      ② 우측 상단 <strong style="color:#fff">+</strong> 탭<br>
+      ③ <strong style="color:#fff">"동작 추가"</strong> → <strong style="color:#fff">"알림 보내기"</strong> 검색<br>
+      ④ 메시지: <strong style="color:#fff">"VocabFlix 퀴즈 시간! 📚"</strong> 입력<br>
+      ⑤ 우측 상단 <strong style="color:#fff">완료</strong><br>
+      ⑥ <strong style="color:#fff">자동화</strong> 탭 → <strong style="color:#fff">+</strong> → <strong style="color:#fff">"시간"</strong><br>
+      ⑦ 시간 <strong style="color:#fff">12:20</strong> 설정 → 만든 단축어 선택<br><br>
+      <span style="color:var(--green)">✓ 이렇게 하면 매일 지정 시간에 진짜 알림이 와요!</span>
+    </div>
+  </div>
     <div style="font-size:13px;color:var(--muted);line-height:2">
       📖 +1일 — 뜻 보고 단어 맞추기<br>
       ✏️ +2일 — 단어 보고 뜻 맞추기<br>
@@ -412,35 +424,54 @@ async function buildQuizPool() {
 }
 
 // ═══════════════════════════════════════
-// MYMEMORY TRANSLATION API
+// DICTIONARY API (Free Dictionary + MyMemory)
 // ═══════════════════════════════════════
 async function translateWord(word) {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ko`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.responseStatus !== 200) throw new Error('Translation failed');
-  const ko = data.responseData.translatedText;
-
-  // Also get English definition
+  const w = word.toLowerCase().trim();
+  let meanings = [];
   let example = '';
+
+  // 1. Free Dictionary API — 품사별 영어 뜻 + 예문
   try {
-    const defRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    const defRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(w)}`);
     const defData = await defRes.json();
     if (Array.isArray(defData) && defData[0]) {
-      const meanings = defData[0].meanings;
-      if (meanings && meanings[0] && meanings[0].definitions && meanings[0].definitions[0]) {
-        example = meanings[0].definitions[0].example || meanings[0].definitions[0].definition || '';
-        example = example.slice(0, 80);
+      for (const m of defData[0].meanings) {
+        const pos = m.partOfSpeech;
+        const defs = m.definitions.slice(0, 2);
+        for (const d of defs) {
+          try {
+            const tRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(d.definition)}&langpair=en|ko`);
+            const tData = await tRes.json();
+            const kodef = tData.responseData?.translatedText || d.definition;
+            meanings.push({ pos, ko: kodef });
+            if (!example && d.example) example = d.example.slice(0, 100);
+          } catch(e) {
+            meanings.push({ pos, ko: d.definition });
+          }
+        }
+        if (meanings.length >= 4) break;
       }
     }
   } catch(e) {}
 
-  return {
-    word: word.toLowerCase().trim(),
-    meaning_ko: ko,
-    pos: '',
-    example: example
-  };
+  // 2. Fallback: 단어 직접 번역
+  if (!meanings.length) {
+    try {
+      const tRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(w)}&langpair=en|ko`);
+      const tData = await tRes.json();
+      const ko = tData.responseData?.translatedText || w;
+      meanings.push({ pos: '', ko });
+    } catch(e) { throw new Error('검색 실패'); }
+  }
+
+  const posMap = { noun:'명사', verb:'동사', adjective:'형용사', adverb:'부사', preposition:'전치사', conjunction:'접속사', pronoun:'대명사', interjection:'감탄사' };
+  const nums = ['①','②','③','④'];
+  const meaning_ko = meanings.length > 1
+    ? meanings.map((m, i) => `${nums[i]} ${posMap[m.pos] ? `[${posMap[m.pos]}] ` : ''}${m.ko}`).join('\n')
+    : meanings[0]?.ko || '';
+  const pos = meanings[0]?.pos || '';
+  return { word: w, meaning_ko, pos, example, meanings };
 }
 
 // ═══════════════════════════════════════
@@ -477,10 +508,14 @@ async function searchWord() {
       lastWrongAt: null
     };
 
+    const meaningsHtml = pendingWord.meaning_ko.split('\n').map(line =>
+      `<div style="margin-bottom:6px">${line}</div>`
+    ).join('');
     previewArea.innerHTML = `
       <div class="preview-card">
         <div class="preview-word">${pendingWord.word}</div>
-        <div class="preview-meaning">${pendingWord.meaning_ko}</div>
+        ${pendingWord.pos ? `<div class="preview-pos">${pendingWord.pos}</div>` : ''}
+        <div class="preview-meaning" style="white-space:pre-line;font-size:15px;line-height:1.8">${pendingWord.meaning_ko}</div>
         ${pendingWord.example ? `<div class="preview-example">"${pendingWord.example}"</div>` : ''}
         <div class="preview-actions">
           <button class="btn btn-green btn-bebas" onclick="confirmAdd()">✓ 단어장 추가</button>
