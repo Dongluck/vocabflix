@@ -494,6 +494,10 @@ async function searchWord() {
         ${pendingWord.pos ? `<div class="preview-pos" style="margin-top:8px">${pendingWord.pos}</div>` : ''}
         <div class="preview-meaning" style="white-space:pre-line;font-size:15px;line-height:1.8;margin-top:10px">${pendingWord.meaning_ko}</div>
         ${pendingWord.example ? `<div class="preview-example">"${pendingWord.example}"</div>` : ''}
+        <div style="margin-top:14px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">✏️ 뜻 직접 입력 (비워두면 위 뜻으로 저장)</div>
+          <input type="text" id="custom-meaning" placeholder="내가 원하는 뜻으로 바꿀 수 있어요" autocomplete="off">
+        </div>
         <div class="preview-actions">
           <button class="btn btn-green btn-bebas" onclick="confirmAdd()">✓ 단어장 추가</button>
           <button class="btn btn-gray" onclick="cancelAdd()">추가 안 함</button>
@@ -507,6 +511,8 @@ async function searchWord() {
 
 async function confirmAdd() {
   if (!pendingWord) return;
+  const customMeaning = document.getElementById('custom-meaning')?.value.trim();
+  if (customMeaning) pendingWord.meaning_ko = customMeaning;
   await dbPut(pendingWord);
   pendingWord = null;
   document.getElementById('word-input').value = '';
