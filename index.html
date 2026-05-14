@@ -266,6 +266,15 @@ input[type="text"]::placeholder { color: #444; }
 <!-- SETTINGS PAGE -->
 <div id="page-settings" class="page">
   <div class="card">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔑 KRDict API 키</div>
+    <input type="password" id="krdict-key-input" placeholder="API 키 입력" style="margin-bottom:10px" autocomplete="off">
+    <button class="btn btn-red btn-full" onclick="saveApiKey()">저장</button>
+    <div style="font-size:11px;color:#444;margin-top:10px;line-height:1.6">
+      krdict.korean.go.kr → 오픈 API → API 키 발급 (무료)<br>
+      키는 이 기기에만 저장되며 외부로 전송되지 않아요.
+    </div>
+  </div>
+  <div class="card">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔔 iOS 알림 설정 (단축어 앱)</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.9">
       앱이 꺼져있어도 알림을 받으려면 아이폰 <strong style="color:#fff">단축어</strong> 앱을 사용하세요.<br><br>
@@ -343,14 +352,20 @@ const loadWords = async () => (await dbGetAll()).sort((a,b) => b.addedAt - a.add
 // Base intervals in days
 const BASE_INTERVALS = [1, 2, 4, 7, 14];
 
+function getMidnight(ts) {
+  const d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
 function getNextDue(word) {
-  // Wrong count increases frequency: extra reviews every floor(wrongCount/2) days
   const wrongBonus = Math.floor((word.wrongCount || 0) / 2);
   const completedCount = (word.completedSteps || []).length;
-  if (completedCount >= BASE_INTERVALS.length) return null; // fully done
+  if (completedCount >= BASE_INTERVALS.length) return null;
 
   const interval = Math.max(1, BASE_INTERVALS[completedCount] - wrongBonus);
-  return word.addedAt + interval * 86400000;
+  // 저장한 날 자정 + interval일
+  return getMidnight(word.addedAt) + interval * 86400000;
 }
 
 async function getDueItems() {
@@ -379,12 +394,15 @@ async function getDueItems() {
   return due;
 }
 
-// Build quiz pool: 10 en→ko + 10 ko→en, weighted by wrong count
+// Build quiz pool: 하루 1회, 10 en→ko + 10 ko→en (총 20개)
 async function buildQuizPool() {
+  // 오늘 이미 풀었으면 빈 배열
+  const todayStr = new Date().toDateString();
+  if (localStorage.getItem('vf_quiz_done') === todayStr) return [];
+
   const due = await getDueItems();
   const enToKo = due.filter(d => d.type === 'en_to_ko').slice(0, 10);
   const koToEn = due.filter(d => d.type === 'ko_to_en').slice(0, 10);
-  // Interleave
   const pool = [];
   const max = Math.max(enToKo.length, koToEn.length);
   for (let i = 0; i < max; i++) {
@@ -395,54 +413,68 @@ async function buildQuizPool() {
 }
 
 // ═══════════════════════════════════════
-// DICTIONARY API (Free Dictionary + MyMemory)
+// KRDict API
 // ═══════════════════════════════════════
+function getApiKey() {
+  return localStorage.getItem('vf_krdict_key') || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('krdict-key-input').value.trim();
+  if (!key) { showToast('API 키를 입력해주세요'); return; }
+  localStorage.setItem('vf_krdict_key', key);
+  showToast('API 키가 저장됐어요 ✓');
+}
+
 async function translateWord(word) {
   const w = word.toLowerCase().trim();
-  let meanings = [];
+  const apiKey = getApiKey();
+
+  if (!apiKey) throw new Error('API 키 없음');
+
+  // KRDict API 호출
+  const url = `https://krdict.korean.go.kr/api/search?key=${apiKey}&q=${encodeURIComponent(w)}&translated=y&trans_lang=1&part=word&sort=popular&num=5`;
+  const res = await fetch(url);
+  const text = await res.text();
+
+  // XML 파싱
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'text/xml');
+  const items = xml.querySelectorAll('item');
+
+  if (!items.length) throw new Error('검색 결과 없음');
+
+  const meanings = [];
   let example = '';
+  const posMap = { '명사':'명사', '동사':'동사', '형용사':'형용사', '부사':'부사', '대명사':'대명사', '수사':'수사', '관형사':'관형사', '감탄사':'감탄사', '조사':'조사', '접속사':'접속사' };
+  const nums = ['①','②','③','④','⑤'];
 
-  // 1. Free Dictionary API — 품사별 영어 뜻 + 예문
-  try {
-    const defRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(w)}`);
-    const defData = await defRes.json();
-    if (Array.isArray(defData) && defData[0]) {
-      for (const m of defData[0].meanings) {
-        const pos = m.partOfSpeech;
-        const defs = m.definitions.slice(0, 2);
-        for (const d of defs) {
-          try {
-            const tRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(d.definition)}&langpair=en|ko`);
-            const tData = await tRes.json();
-            const kodef = tData.responseData?.translatedText || d.definition;
-            meanings.push({ pos, ko: kodef });
-            if (!example && d.example) example = d.example.slice(0, 100);
-          } catch(e) {
-            meanings.push({ pos, ko: d.definition });
-          }
+  for (const item of items) {
+    const pos = item.querySelector('pos')?.textContent || '';
+    const senses = item.querySelectorAll('sense');
+    for (const sense of senses) {
+      const transWord = sense.querySelector('trans_word')?.textContent || '';
+      const transDfn = sense.querySelector('trans_dfn')?.textContent || '';
+      const koMeaning = transWord || transDfn;
+      if (koMeaning) {
+        meanings.push({ pos, ko: koMeaning });
+        if (!example) {
+          const exText = sense.querySelector('example')?.textContent || '';
+          if (exText) example = exText.slice(0, 100);
         }
-        if (meanings.length >= 4) break;
       }
+      if (meanings.length >= 4) break;
     }
-  } catch(e) {}
-
-  // 2. Fallback: 단어 직접 번역
-  if (!meanings.length) {
-    try {
-      const tRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(w)}&langpair=en|ko`);
-      const tData = await tRes.json();
-      const ko = tData.responseData?.translatedText || w;
-      meanings.push({ pos: '', ko });
-    } catch(e) { throw new Error('검색 실패'); }
+    if (meanings.length >= 4) break;
   }
 
-  const posMap = { noun:'명사', verb:'동사', adjective:'형용사', adverb:'부사', preposition:'전치사', conjunction:'접속사', pronoun:'대명사', interjection:'감탄사' };
-  const nums = ['①','②','③','④'];
+  if (!meanings.length) throw new Error('번역 결과 없음');
+
   const meaning_ko = meanings.length > 1
-    ? meanings.map((m, i) => `${nums[i]} ${posMap[m.pos] ? `[${posMap[m.pos]}] ` : ''}${m.ko}`).join('\n')
-    : meanings[0]?.ko || '';
-  const pos = meanings[0]?.pos || '';
-  return { word: w, meaning_ko, pos, example, meanings };
+    ? meanings.map((m, i) => `${nums[i]} ${m.pos ? `[${m.pos}] ` : ''}${m.ko}`).join('\n')
+    : meanings[0].ko;
+
+  return { word: w, meaning_ko, pos: meanings[0]?.pos || '', example, meanings };
 }
 
 // ═══════════════════════════════════════
@@ -496,7 +528,10 @@ async function searchWord() {
         </div>
       </div>`;
   } catch(e) {
-    previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--red)">검색 실패. 영어 단어인지 확인해주세요.</div>`;
+    const noKey = !getApiKey();
+    previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--red)">
+      ${noKey ? '⚙️ 설정 탭에서 KRDict API 키를 먼저 입력해주세요!' : '검색 실패. 단어를 확인하거나 다시 시도해주세요.'}
+    </div>`;
   }
   btn.disabled = false; btn.textContent = '검색';
 }
@@ -611,25 +646,34 @@ async function renderQuiz() {
     quizPool = await buildQuizPool();
   }
   const container = document.getElementById('quiz-container');
+  const todayStr = new Date().toDateString();
+
+  // 오늘 이미 완료한 경우
+  if (localStorage.getItem('vf_quiz_done') === todayStr && quizIndex === 0) {
+    container.innerHTML = `
+      <div class="no-quiz">
+        <div class="icon">🏆</div>
+        <h3>오늘 복습 완료!</h3>
+        <p>오늘의 퀴즈를 모두 풀었어요.<br>내일 자정에 새 퀴즈가 생겨요!</p>
+      </div>`; return;
+  }
 
   if (!quizPool.length) {
     container.innerHTML = `
       <div class="no-quiz">
         <div class="icon">🎬</div>
         <h3>오늘 퀴즈 없음!</h3>
-        <p>단어를 추가하면 다음 날부터<br>퀴즈가 자동으로 생성돼요.</p>
+        <p>단어를 추가하면 다음 날 자정부터<br>퀴즈가 자동으로 생성돼요.</p>
       </div>`; return;
   }
 
   if (quizIndex >= quizPool.length) {
-    quizSessionDone = true;
-    localStorage.setItem('vf_quiz_done', new Date().toDateString());
+    localStorage.setItem('vf_quiz_done', todayStr);
     container.innerHTML = `
       <div class="no-quiz">
         <div class="icon">🏆</div>
         <h3>오늘 복습 완료!</h3>
-        <p>총 ${quizPool.length}문제를 풀었어요.<br>내일 또 만나요!</p>
-        <button class="btn btn-red btn-full" style="margin-top:20px" onclick="quizIndex=0;renderQuiz()">다시 풀기</button>
+        <p>총 ${quizPool.length}문제를 풀었어요.<br>내일 자정에 새 퀴즈가 생겨요!</p>
       </div>`; return;
   }
 
@@ -656,7 +700,7 @@ async function renderQuiz() {
         <input type="text" id="quiz-ans" placeholder="${type === 'en_to_ko' ? '한국어 뜻 입력...' : '영어 단어 입력...'}" onkeydown="if(event.key==='Enter')checkAnswer()" autocomplete="off" autocorrect="off" autocapitalize="off">
       </div>
       <div id="result-area"></div>
-      <div class="btn-row">
+      <div class="btn-row" id="quiz-btns">
         <button class="btn btn-gray btn-bebas" onclick="skipQuiz()">모르겠어요</button>
         <button class="btn btn-red btn-bebas" id="quiz-btn" onclick="checkAnswer()">확인</button>
       </div>
@@ -666,33 +710,47 @@ async function renderQuiz() {
 }
 
 async function checkAnswer() {
-  if (quizAnswered) { quizIndex++; renderQuiz(); return; }
+  if (quizAnswered) return;
   const item = quizPool[quizIndex];
   const w = item.word; const type = item.type;
   const ansEl = document.getElementById('quiz-ans');
-  const userAns = (ansEl?.value || '').trim().toLowerCase();
+  const userAns = (ansEl?.value || '').trim();
   if (!userAns) return;
 
   quizAnswered = true;
   if (ansEl) ansEl.disabled = true;
 
   const correctRaw = type === 'en_to_ko' ? w.meaning_ko : w.word;
-  const correct = correctRaw.toLowerCase();
-  const tokens = correct.split(/[\s,\/·\(\)]+/).filter(t => t.length > 1);
-  const isCorrect = tokens.some(t => userAns.includes(t)) || userAns === correct;
 
-  const resultArea = document.getElementById('result-area');
-  const btn = document.getElementById('quiz-btn');
+  // 정답 보여주고 자가 채점 버튼 표시
+  document.getElementById('result-area').innerHTML = `
+    <div class="quiz-result" style="background:var(--card2);border:1px solid var(--border)">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">정답</div>
+      <div class="result-word">${correctRaw}</div>
+      ${type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
+      ${w.example ? `<div class="result-sub" style="font-style:italic;margin-top:8px">"${w.example}"</div>` : ''}
+      <div style="margin-top:6px;font-size:13px;color:var(--muted)">내 답: <span style="color:#fff">${userAns}</span></div>
+    </div>`;
+
+  // 자가 채점 버튼으로 교체
+  document.getElementById('quiz-btns').innerHTML = `
+    <button class="btn btn-bebas" style="flex:1;background:#081a08;color:var(--green);border:1px solid #1a4a1a;font-size:18px" onclick="gradeAnswer(true)">✅ 맞았어요</button>
+    <button class="btn btn-bebas" style="flex:1;background:#1a0808;color:#ff6666;border:1px solid #4a1a1a;font-size:18px" onclick="gradeAnswer(false)">❌ 틀렸어요</button>`;
+}
+
+async function gradeAnswer(isCorrect) {
+  const item = quizPool[quizIndex];
+  const w = item.word;
+  const correctRaw = item.type === 'en_to_ko' ? w.meaning_ko : w.word;
 
   if (isCorrect) {
-    resultArea.innerHTML = `
+    document.getElementById('result-area').innerHTML = `
       <div class="quiz-result correct">
         <div class="result-icon">✅</div>
         <div class="result-word">${correctRaw}</div>
-        ${type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
+        ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
         ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
       </div>`;
-    // Mark step done
     const words = await loadWords();
     const word = words.find(x => x.id === w.id);
     if (word) {
@@ -702,14 +760,14 @@ async function checkAnswer() {
     }
     showToast('정답! 🎉');
   } else {
-    resultArea.innerHTML = `
+    document.getElementById('result-area').innerHTML = `
       <div class="quiz-result wrong">
         <div class="result-icon">❌</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
         <div class="result-word">${correctRaw}</div>
+        ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
         ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
       </div>`;
-    // Increment wrong count
     const words = await loadWords();
     const word = words.find(x => x.id === w.id);
     if (word) {
@@ -717,38 +775,44 @@ async function checkAnswer() {
       word.lastWrongAt = Date.now();
       await dbPut(word);
       if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
+      else showToast('오답 처리됐어요');
     }
-    showToast('다음엔 맞을 수 있어요!');
   }
 
-  if (btn) btn.textContent = '다음 →';
+  // 다음 버튼으로 교체
+  document.getElementById('quiz-btns').innerHTML = `
+    <button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
+
   await updateStats();
 }
 
 async function skipQuiz() {
   if (quizAnswered) { quizIndex++; renderQuiz(); return; }
   const item = quizPool[quizIndex];
-  const correctRaw = item.type === 'en_to_ko' ? item.word.meaning_ko : item.word.word;
+  const w = item.word;
+  const correctRaw = item.type === 'en_to_ko' ? w.meaning_ko : w.word;
   quizAnswered = true;
 
   document.getElementById('result-area').innerHTML = `
     <div class="quiz-result wrong">
-      <div class="result-icon">💡</div>
+      <div class="result-icon">❌</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
       <div class="result-word">${correctRaw}</div>
+      ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
+      ${w.example ? `<div class="result-sub" style="font-style:italic;margin-top:8px">"${w.example}"</div>` : ''}
     </div>`;
   document.getElementById('quiz-btn').textContent = '다음 →';
   const ansEl = document.getElementById('quiz-ans');
   if (ansEl) ansEl.disabled = true;
 
-  // Count as wrong
   const words = await loadWords();
-  const word = words.find(x => x.id === item.word.id);
+  const word = words.find(x => x.id === w.id);
   if (word) {
     word.wrongCount = (word.wrongCount || 0) + 1;
     word.lastWrongAt = Date.now();
     await dbPut(word);
     if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
+    else showToast('오답 처리됐어요');
   }
   await updateStats();
 }
@@ -884,6 +948,11 @@ function showPage(name, btn) {
   if (name === 'quiz') { quizIndex = 0; renderQuiz(); }
   if (name === 'words') renderWords();
   if (name === 'wrong') renderWrong();
+  if (name === 'settings') {
+    const saved = getApiKey();
+    const input = document.getElementById('krdict-key-input');
+    if (input && saved) input.placeholder = '저장됨 ✓ (변경하려면 새 키 입력)';
+  }
   updateStats();
 }
 
