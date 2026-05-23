@@ -394,7 +394,7 @@ async function getDueItems() {
   return due;
 }
 
-// Build quiz pool: 정오(12:00) 기준 하루 1회 생성, 캐시 유지
+// Build quiz pool: 정오(12:00) 기준 하루 1회 생성, 같은 단어 중복 없음
 async function buildQuizPool() {
   const now = new Date();
   const todayNoonStr = `${now.toDateString()}_noon`;
@@ -403,7 +403,7 @@ async function buildQuizPool() {
   if (localStorage.getItem('vf_quiz_done') === now.toDateString()) return [];
 
   // 오늘 정오 이전이면 퀴즈 없음
-  if (now.getHours() < 12) return null; // null = 정오 전
+  if (now.getHours() < 12) return null;
 
   // 이미 오늘 풀을 만들었으면 캐시에서 꺼냄
   const cached = localStorage.getItem('vf_quiz_pool');
@@ -412,10 +412,29 @@ async function buildQuizPool() {
     return JSON.parse(cached);
   }
 
-  // 새 풀 생성
+  // 새 풀 생성 — 단어별로 중복 제거 (같은 단어가 en_to_ko, ko_to_en 각각 최대 1번씩)
   const due = await getDueItems();
-  const enToKo = due.filter(d => d.type === 'en_to_ko').slice(0, 10);
-  const koToEn = due.filter(d => d.type === 'ko_to_en').slice(0, 10);
+  const seenEnToKo = new Set();
+  const seenKoToEn = new Set();
+  const enToKo = [];
+  const koToEn = [];
+
+  for (const d of due) {
+    if (d.type === 'en_to_ko' && !seenEnToKo.has(d.word.id)) {
+      seenEnToKo.add(d.word.id);
+      enToKo.push(d);
+      if (enToKo.length >= 10) break;
+    }
+  }
+  for (const d of due) {
+    if (d.type === 'ko_to_en' && !seenKoToEn.has(d.word.id)) {
+      seenKoToEn.add(d.word.id);
+      koToEn.push(d);
+      if (koToEn.length >= 10) break;
+    }
+  }
+
+  // 인터리브 (영→한, 한→영 번갈아)
   const pool = [];
   const max = Math.max(enToKo.length, koToEn.length);
   for (let i = 0; i < max; i++) {
@@ -423,7 +442,6 @@ async function buildQuizPool() {
     if (i < koToEn.length) pool.push(koToEn[i]);
   }
 
-  // 캐시 저장 (word.id만 저장해서 나중에 복원)
   localStorage.setItem('vf_quiz_pool', JSON.stringify(pool));
   localStorage.setItem('vf_quiz_pool_date', todayNoonStr);
   return pool;
