@@ -464,12 +464,14 @@ function saveApiKey() {
 async function translateWord(word) {
   const w = word.toLowerCase().trim();
   const apiKey = getApiKey();
-
   if (!apiKey) throw new Error('API 키 없음');
 
-  // KRDict API 호출
-  const url = `https://krdict.korean.go.kr/api/search?key=${apiKey}&q=${encodeURIComponent(w)}&translated=y&trans_lang=1&part=word&sort=popular&num=5`;
-  const res = await fetch(url);
+  // Cloudflare Worker를 통해 KRDict 호출 (CORS 우회)
+  const res = await fetch('https://vocabflix-api.bbnn47.workers.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ word: w, apiKey })
+  });
   const text = await res.text();
 
   // XML 파싱
@@ -481,7 +483,6 @@ async function translateWord(word) {
 
   const meanings = [];
   let example = '';
-  const posMap = { '명사':'명사', '동사':'동사', '형용사':'형용사', '부사':'부사', '대명사':'대명사', '수사':'수사', '관형사':'관형사', '감탄사':'감탄사', '조사':'조사', '접속사':'접속사' };
   const nums = ['①','②','③','④','⑤'];
 
   for (const item of items) {
