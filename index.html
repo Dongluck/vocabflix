@@ -468,22 +468,32 @@ function saveApiKey() {
 async function translateWord(word) {
   const w = word.toLowerCase().trim();
   const apiKey = getApiKey();
-  if (!apiKey) throw new Error('API 키 없음');
+  if (!apiKey) throw new Error('API_KEY_MISSING');
 
-  // Cloudflare Worker를 통해 KRDict 호출 (CORS 우회)
-  const res = await fetch('https://vocabflix-api.bbnn47.workers.dev', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ word: w, apiKey })
-  });
-  const text = await res.text();
+  let res, text;
+  try {
+    res = await fetch('https://vocabflix-api.bbnn47.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word: w, apiKey })
+    });
+    text = await res.text();
+  } catch(e) {
+    throw new Error('NETWORK_ERROR: ' + e.message);
+  }
+
+  if (!res.ok) throw new Error('WORKER_ERROR_' + res.status + ': ' + text.slice(0, 100));
 
   // XML 파싱
   const parser = new DOMParser();
   const xml = parser.parseFromString(text, 'text/xml');
-  const items = xml.querySelectorAll('item');
 
-  if (!items.length) throw new Error('검색 결과 없음');
+  // 에러 체크
+  const errorEl = xml.querySelector('error');
+  if (errorEl) throw new Error('KRDICT_ERROR: ' + errorEl.textContent);
+
+  const items = xml.querySelectorAll('item');
+  if (!items.length) throw new Error('NO_RESULTS: ' + text.slice(0, 200));
 
   const meanings = [];
   let example = '';
@@ -508,7 +518,7 @@ async function translateWord(word) {
     if (meanings.length >= 4) break;
   }
 
-  if (!meanings.length) throw new Error('번역 결과 없음');
+  if (!meanings.length) throw new Error('NO_MEANINGS: ' + text.slice(0, 200));
 
   const meaning_ko = meanings.length > 1
     ? meanings.map((m, i) => `${nums[i]} ${m.pos ? `[${m.pos}] ` : ''}${m.ko}`).join('\n')
@@ -570,7 +580,9 @@ async function searchWord() {
   } catch(e) {
     const noKey = !getApiKey();
     previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--red)">
-      ${noKey ? '⚙️ 설정 탭에서 KRDict API 키를 먼저 입력해주세요!' : '검색 실패. 단어를 확인하거나 다시 시도해주세요.'}
+      ${noKey
+        ? '⚙️ 설정 탭에서 KRDict API 키를 먼저 입력해주세요!'
+        : '검색 실패: ' + e.message}
     </div>`;
   }
   btn.disabled = false; btn.textContent = '검색';
