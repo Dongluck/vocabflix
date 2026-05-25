@@ -13,53 +13,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --red: #E50914;
-  --dark: #0a0a0a;
-  --card: #141414;
-  --card2: #1e1e1e;
-  --card3: #252525;
-  --text: #f0f0f0;
-  --muted: #777;
-  --green: #46d369;
-  --yellow: #f5c518;
-  --orange: #ff6b35;
-  --border: #2a2a2a;
+  --red: #E50914; --dark: #0a0a0a; --card: #141414; --card2: #1e1e1e;
+  --text: #f0f0f0; --muted: #777; --green: #46d369; --yellow: #f5c518;
+  --orange: #ff6b35; --border: #2a2a2a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
 body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-/* ── HEADER ── */
 header {
-  background: linear-gradient(180deg, #000 0%, transparent 100%);
-  padding: 20px 20px 12px;
-  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg,#000 0%,transparent 100%);
+  padding: 20px 20px 12px; display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
 }
 .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--red); letter-spacing: 3px; }
 .logo span { color: #fff; }
-.header-badge { font-size: 11px; color: var(--muted); background: var(--card); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
 
-/* ── SPEAK BTN ── */
-.speak-btn {
-  background: none; border: 1px solid var(--border); border-radius: 20px;
-  color: var(--muted); font-size: 13px; padding: 4px 12px;
-  cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-  transition: all .2s; margin-top: 8px;
-}
-.speak-btn:active { background: var(--card2); color: #fff; }
-.speak-btn.speaking { color: var(--green); border-color: var(--green); }
-
-/* ── NAV ── */
 nav {
   display: flex; background: #080808; border-bottom: 1px solid var(--border);
   overflow-x: auto; scrollbar-width: none; position: sticky; top: 64px; z-index: 99;
 }
 nav::-webkit-scrollbar { display: none; }
 nav button {
-  flex: 1; min-width: 64px; padding: 12px 4px;
-  background: none; border: none; color: var(--muted);
-  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  flex: 1; min-width: 64px; padding: 12px 4px; background: none; border: none;
+  color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
   cursor: pointer; transition: color .2s; position: relative; white-space: nowrap;
 }
 nav button.active { color: #fff; }
@@ -69,31 +45,25 @@ nav button.active::after {
 }
 .nav-badge {
   display: inline-block; background: var(--red); color: #fff;
-  font-size: 9px; border-radius: 10px; padding: 1px 5px;
-  margin-left: 3px; vertical-align: middle;
+  font-size: 9px; border-radius: 10px; padding: 1px 5px; margin-left: 3px; vertical-align: middle;
 }
 
-/* ── PAGES ── */
 .page { display: none; padding: 16px 16px 100px; }
 .page.active { display: block; }
 
-/* ── CARDS ── */
 .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); }
 .section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 18px 0 10px; }
 
-/* ── INPUT ── */
-input[type="text"], input[type="time"] {
+input[type="text"] {
   background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
   color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; padding: 13px 15px;
   outline: none; transition: border-color .2s; width: 100%;
 }
-input[type="text"]:focus, input[type="time"]:focus { border-color: var(--red); }
+input[type="text"]:focus { border-color: var(--red); }
 input[type="text"]::placeholder { color: #444; }
-
 .input-row { display: flex; gap: 10px; }
 .input-row input { flex: 1; }
 
-/* ── BUTTONS ── */
 .btn { border: none; border-radius: 8px; padding: 13px 18px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .2s; }
 .btn:active { opacity: .7; }
 .btn-red { background: var(--red); color: #fff; }
@@ -103,23 +73,25 @@ input[type="text"]::placeholder { color: #444; }
 .btn-bebas { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
 
-/* ── PREVIEW ── */
-.preview-card {
-  background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px; margin-top: 14px; animation: fadeIn .3s ease;
-}
+.preview-card { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-top: 14px; animation: fadeIn .3s ease; }
 .preview-word { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; letter-spacing: 1px; line-height: 1; }
 .preview-pos { font-size: 11px; color: var(--muted); margin-top: 4px; }
-.preview-meaning { font-size: 17px; color: var(--yellow); font-weight: 600; margin: 12px 0 8px; }
+.preview-meaning { font-size: 15px; color: var(--yellow); font-weight: 600; margin: 12px 0 8px; line-height: 1.8; white-space: pre-line; }
 .preview-example { font-size: 13px; color: #666; font-style: italic; line-height: 1.5; }
 .preview-actions { display: flex; gap: 10px; margin-top: 14px; }
 .preview-actions .btn { flex: 1; }
 
-/* ── WORD CARD ── */
+.speak-btn {
+  background: none; border: 1px solid var(--border); border-radius: 20px;
+  color: var(--muted); font-size: 13px; padding: 4px 12px;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  transition: all .2s; margin-top: 8px;
+}
+.speak-btn:active { background: var(--card2); color: #fff; }
+
 .word-item {
   background: var(--card); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 10px; animation: fadeIn .3s ease;
-  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; animation: fadeIn .3s ease; border: 1px solid var(--border);
 }
 .word-item.danger { border-color: #3a1a1a; background: #180a0a; }
 .word-main { flex: 1; min-width: 0; }
@@ -132,23 +104,19 @@ input[type="text"]::placeholder { color: #444; }
 .del-btn { background: none; border: none; color: #333; font-size: 16px; cursor: pointer; padding: 4px; flex-shrink: 0; }
 .del-btn:active { color: var(--red); }
 
-/* ── STATS ── */
 .stats-row { display: flex; gap: 8px; margin-bottom: 16px; }
 .stat-box { flex: 1; background: var(--card); border-radius: 10px; padding: 14px 8px; text-align: center; border: 1px solid var(--border); }
 .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1; color: var(--red); }
 .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
 
-/* ── QUIZ ── */
 .quiz-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 10px; }
-.quiz-progress { width: 100%; margin-bottom: 20px; }
-.progress-bar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.progress-bar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
 .progress-fill { height: 100%; background: var(--red); border-radius: 3px; transition: width .4s ease; }
-.progress-label { font-size: 11px; color: var(--muted); text-align: right; margin-top: 5px; }
+.progress-label { font-size: 11px; color: var(--muted); text-align: right; margin-bottom: 20px; }
 
 .quiz-card {
   width: 100%; background: var(--card); border-radius: 16px; padding: 32px 24px;
-  text-align: center; margin-bottom: 20px; position: relative; overflow: hidden;
-  border: 1px solid var(--border);
+  text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; border: 1px solid var(--border);
 }
 .quiz-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--red); }
 .quiz-type-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
@@ -175,40 +143,19 @@ input[type="text"]::placeholder { color: #444; }
 .no-quiz h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .no-quiz p { color: var(--muted); font-size: 14px; line-height: 1.7; }
 
-/* ── WRONG WORDS ── */
-.wrong-header {
-  background: linear-gradient(135deg, #1a0500, #0a0000);
-  border: 1px solid #3a1a00; border-radius: 12px; padding: 16px; margin-bottom: 14px;
-  display: flex; align-items: center; gap: 12px;
-}
-.wrong-icon { font-size: 32px; }
-.wrong-info h3 { font-size: 15px; font-weight: 600; }
-.wrong-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-/* ── SETTINGS ── */
-.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.setting-row:last-child { border-bottom: none; }
-.setting-label { font-size: 14px; font-weight: 500; }
-.setting-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
-
-/* ── BACKUP ── */
+.wrong-header { background: linear-gradient(135deg,#1a0500,#0a0000); border: 1px solid #3a1a00; border-radius: 12px; padding: 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
 .backup-row { display: flex; gap: 10px; }
 .backup-row .btn { flex: 1; font-size: 13px; }
 
-/* ── TOAST ── */
 .toast {
   position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: #222; color: #fff; padding: 11px 20px; border-radius: 8px;
-  font-size: 13px; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; pointer-events: none;
-  border: 1px solid var(--border);
+  font-size: 13px; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; pointer-events: none; border: 1px solid var(--border);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── LOADING ── */
 .loading-dots::after { content: ''; animation: dots 1.2s infinite; }
-@keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
-@keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
-
+@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
 </style>
 </head>
@@ -216,6 +163,7 @@ input[type="text"]::placeholder { color: #444; }
 
 <header>
   <div class="logo">VOCAB<span>FLiX</span></div>
+  <div style="font-size:11px;color:var(--muted)" id="due-badge"></div>
 </header>
 
 <nav>
@@ -226,71 +174,50 @@ input[type="text"]::placeholder { color: #444; }
   <button id="nav-settings" onclick="showPage('settings',this)">⚙️ 설정</button>
 </nav>
 
-<!-- ADD PAGE -->
+<!-- ADD -->
 <div id="page-add" class="page active">
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔍 자동 검색</div>
+    <div class="section-title" style="margin-top:0">🔍 영어 단어 검색</div>
     <div class="input-row">
-      <input type="text" id="word-input" placeholder="단어 입력 (예: resilient)" onkeydown="if(event.key==='Enter')searchWord()">
+      <input type="text" id="word-input" placeholder="단어 입력 (예: resilient)" onkeydown="if(event.key==='Enter')searchWord()" autocomplete="off" autocorrect="off" autocapitalize="off">
       <button class="btn btn-red btn-bebas" onclick="searchWord()" id="search-btn" style="white-space:nowrap;padding:13px 20px">검색</button>
     </div>
     <div id="preview-area"></div>
   </div>
-
   <div class="stats-row">
     <div class="stat-box"><div class="stat-num" id="s-total">0</div><div class="stat-label">저장 단어</div></div>
     <div class="stat-box"><div class="stat-num" id="s-due" style="color:var(--yellow)">0</div><div class="stat-label">오늘 퀴즈</div></div>
     <div class="stat-box"><div class="stat-num" id="s-wrong" style="color:var(--orange)">0</div><div class="stat-label">오답 단어</div></div>
     <div class="stat-box"><div class="stat-num" id="s-done" style="color:var(--green)">0</div><div class="stat-label">완료</div></div>
   </div>
-
   <div class="section-title">최근 저장 단어</div>
   <div id="recent-list"></div>
 </div>
 
-<!-- QUIZ PAGE -->
-<div id="page-quiz" class="page">
-  <div id="quiz-container"></div>
-</div>
+<!-- QUIZ -->
+<div id="page-quiz" class="page"><div id="quiz-container"></div></div>
 
-<!-- WORDS PAGE -->
-<div id="page-words" class="page">
-  <div id="words-container"></div>
-</div>
+<!-- WORDS -->
+<div id="page-words" class="page"><div id="words-container"></div></div>
 
-<!-- WRONG PAGE -->
-<div id="page-wrong" class="page">
-  <div id="wrong-container"></div>
-</div>
+<!-- WRONG -->
+<div id="page-wrong" class="page"><div id="wrong-container"></div></div>
 
-<!-- SETTINGS PAGE -->
+<!-- SETTINGS -->
 <div id="page-settings" class="page">
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔑 KRDict API 키</div>
-    <input type="text" id="krdict-key-input" placeholder="API 키 입력" style="margin-bottom:10px" autocomplete="off" autocorrect="off" autocapitalize="off">
-    <button class="btn btn-red btn-full" onclick="saveApiKey()">저장</button>
-    <div id="api-key-status" style="font-size:12px;color:var(--green);margin-top:8px;display:none">저장됨 ✓</div>
-    <div style="font-size:11px;color:#444;margin-top:10px;line-height:1.6">
-      krdict.korean.go.kr → 오픈 API → API 키 발급 (무료)<br>
-      키는 이 기기에만 저장되며 외부로 전송되지 않아요.
-    </div>
-  </div>
-  <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔔 iOS 알림 설정 (단축어 앱)</div>
+    <div class="section-title" style="margin-top:0">🔔 iOS 알림 설정 (단축어 앱)</div>
     <div style="font-size:13px;color:var(--muted);line-height:1.9">
       앱이 꺼져있어도 알림을 받으려면 아이폰 <strong style="color:#fff">단축어</strong> 앱을 사용하세요.<br><br>
-      <span style="color:var(--yellow)">① 단축어 앱 열기</span><br>
-      ② 우측 상단 <strong style="color:#fff">+</strong> 탭<br>
-      ③ <strong style="color:#fff">"동작 추가"</strong> → <strong style="color:#fff">"알림 보내기"</strong> 검색<br>
-      ④ 메시지: <strong style="color:#fff">"VocabFlix 퀴즈 시간! 📚"</strong> 입력 → 완료<br>
-      ⑤ <strong style="color:#fff">자동화</strong> 탭 → <strong style="color:#fff">+</strong> → <strong style="color:#fff">"시간"</strong><br>
-      ⑥ 원하는 시간 설정 → 만든 단축어 선택<br><br>
+      ① 단축어 앱 열기<br>
+      ② 우측 상단 <strong style="color:#fff">+</strong> → <strong style="color:#fff">"동작 추가"</strong> → <strong style="color:#fff">"알림 보내기"</strong><br>
+      ③ 메시지: <strong style="color:#fff">"VocabFlix 퀴즈 시간! 📚"</strong> → 완료<br>
+      ④ <strong style="color:#fff">자동화</strong> 탭 → <strong style="color:#fff">+</strong> → <strong style="color:#fff">"시간"</strong> → 원하는 시간 설정<br><br>
       <span style="color:var(--green)">✓ 매일 지정 시간에 진짜 푸시 알림이 와요!</span>
     </div>
   </div>
-
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">복습 스케줄</div>
+    <div class="section-title" style="margin-top:0">복습 스케줄</div>
     <div style="font-size:13px;color:var(--muted);line-height:2">
       📖 +1일 — 뜻 보고 단어 맞추기<br>
       ✏️ +2일 — 단어 보고 뜻 맞추기<br>
@@ -301,21 +228,15 @@ input[type="text"]::placeholder { color: #444; }
       <span style="color:#ff4444">⚠️ 5회 이상 틀리면 오답 단어장 등록</span>
     </div>
   </div>
-
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">💾 데이터 백업</div>
+    <div class="section-title" style="margin-top:0">💾 데이터 백업</div>
     <div class="backup-row">
       <button class="btn btn-gray" onclick="exportData()">📤 내보내기</button>
-      <label class="btn btn-gray" style="cursor:pointer;text-align:center">
-        📥 불러오기
-        <input type="file" accept=".json" style="display:none" onchange="importData(event)">
-      </label>
+      <label class="btn btn-gray" style="cursor:pointer;text-align:center">📥 불러오기<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
     </div>
-    <div style="font-size:11px;color:#333;margin-top:10px;line-height:1.5">정기적으로 백업해두면 폰을 바꿔도 복원할 수 있어요.</div>
   </div>
-
   <div class="card">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">위험 구역</div>
+    <div class="section-title" style="margin-top:0">위험 구역</div>
     <button class="btn btn-gray btn-full" onclick="resetAll()" style="color:#ff4444;border-color:#3a0000">전체 데이터 초기화</button>
   </div>
 </div>
@@ -323,254 +244,113 @@ input[type="text"]::placeholder { color: #444; }
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════
-// IndexedDB
-// ═══════════════════════════════════════
-const DB_NAME = 'vocabflix_v3';
-const DB_VER = 1;
+// ── IndexedDB ──
+const DB_NAME = 'vocabflix_v3', STORE = 'words';
 let db = null;
-
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VER);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains('words')) d.createObjectStore('words', { keyPath: 'id' });
-    };
-    req.onsuccess = e => { db = e.target.result; resolve(); };
-    req.onerror = reject;
+  return new Promise((res,rej) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => { const d=e.target.result; if(!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE,{keyPath:'id'}); };
+    req.onsuccess = e => { db=e.target.result; res(); };
+    req.onerror = rej;
   });
 }
-const tx = (store, mode='readonly') => db.transaction(store, mode).objectStore(store);
-const dbGetAll = () => new Promise((res,rej) => { const r = tx('words').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=rej; });
-const dbPut = w => new Promise((res,rej) => { const r = tx('words','readwrite').put(w); r.onsuccess=res; r.onerror=rej; });
-const dbDel = id => new Promise((res,rej) => { const r = tx('words','readwrite').delete(id); r.onsuccess=res; r.onerror=rej; });
-const loadWords = async () => (await dbGetAll()).sort((a,b) => b.addedAt - a.addedAt);
+const dbGetAll = () => new Promise((res,rej) => { const r=db.transaction(STORE).objectStore(STORE).getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=rej; });
+const dbPut = w => new Promise((res,rej) => { const r=db.transaction(STORE,'readwrite').objectStore(STORE).put(w); r.onsuccess=res; r.onerror=rej; });
+const dbDel = id => new Promise((res,rej) => { const r=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id); r.onsuccess=res; r.onerror=rej; });
+const loadWords = async () => (await dbGetAll()).sort((a,b)=>b.addedAt-a.addedAt);
 
-// ═══════════════════════════════════════
-// SCHEDULE & DUE LOGIC
-// ═══════════════════════════════════════
-// Base intervals in days
-const BASE_INTERVALS = [1, 2, 4, 7, 14];
-
-function getMidnight(ts) {
-  const d = new Date(ts);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
-}
-
+// ── Schedule ──
+const INTERVALS = [1,2,4,7,14];
+function getMidnight(ts) { const d=new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }
 function getNextDue(word) {
-  const wrongBonus = Math.floor((word.wrongCount || 0) / 2);
-  const completedCount = (word.completedSteps || []).length;
-  if (completedCount >= BASE_INTERVALS.length) return null;
-
-  const interval = Math.max(1, BASE_INTERVALS[completedCount] - wrongBonus);
-  // 저장한 날 자정 + interval일
-  return getMidnight(word.addedAt) + interval * 86400000;
+  const bonus = Math.floor((word.wrongCount||0)/2);
+  const done = (word.completedSteps||[]).length;
+  if (done >= INTERVALS.length) return null;
+  return getMidnight(word.addedAt) + Math.max(1, INTERVALS[done]-bonus) * 86400000;
 }
-
 async function getDueItems() {
   const words = await loadWords();
   const due = [];
   const now = Date.now();
   words.forEach(w => {
-    const nextDue = getNextDue(w);
-    if (nextDue && now >= nextDue) {
-      // Determine quiz type
-      const completedCount = (w.completedSteps || []).length;
-      let type;
-      if (completedCount === 4) type = Math.random() > .5 ? 'en_to_ko' : 'ko_to_en';
-      else type = completedCount % 2 === 0 ? 'ko_to_en' : 'en_to_ko';
-
-      // Weight by wrong count: add extra copies
-      const weight = 1 + Math.floor((w.wrongCount || 0) / 2);
-      for (let i = 0; i < weight; i++) due.push({ word: w, type });
-    }
+    const next = getNextDue(w);
+    if (!next || now < next) return;
+    const done = (w.completedSteps||[]).length;
+    const type = done===4 ? (Math.random()>.5?'en_to_ko':'ko_to_en') : done%2===0?'ko_to_en':'en_to_ko';
+    const weight = 1 + Math.floor((w.wrongCount||0)/2);
+    for (let i=0;i<weight;i++) due.push({word:w, type});
   });
-  // Shuffle
-  for (let i = due.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [due[i], due[j]] = [due[j], due[i]];
-  }
   return due;
 }
 
-// Build quiz pool: 정오(12:00) 기준 하루 1회 생성, 같은 단어 중복 없음
-async function buildQuizPool() {
-  const now = new Date();
-  const todayNoonStr = `${now.toDateString()}_noon`;
-
-  // 오늘 이미 완료했으면 빈 배열
-  if (localStorage.getItem('vf_quiz_done') === now.toDateString()) return [];
-
-  // 오늘 정오 이전이면 퀴즈 없음
-  if (now.getHours() < 12) return null;
-
-  // 이미 오늘 풀을 만들었으면 캐시에서 꺼냄
-  const cached = localStorage.getItem('vf_quiz_pool');
-  const cachedDate = localStorage.getItem('vf_quiz_pool_date');
-  if (cached && cachedDate === todayNoonStr) {
-    return JSON.parse(cached);
-  }
-
-  // 새 풀 생성 — 단어별로 중복 제거 (같은 단어가 en_to_ko, ko_to_en 각각 최대 1번씩)
-  const due = await getDueItems();
-  const seenEnToKo = new Set();
-  const seenKoToEn = new Set();
-  const enToKo = [];
-  const koToEn = [];
-
-  for (const d of due) {
-    if (d.type === 'en_to_ko' && !seenEnToKo.has(d.word.id)) {
-      seenEnToKo.add(d.word.id);
-      enToKo.push(d);
-      if (enToKo.length >= 10) break;
-    }
-  }
-  for (const d of due) {
-    if (d.type === 'ko_to_en' && !seenKoToEn.has(d.word.id)) {
-      seenKoToEn.add(d.word.id);
-      koToEn.push(d);
-      if (koToEn.length >= 10) break;
-    }
-  }
-
-  // 인터리브 (영→한, 한→영 번갈아)
-  const pool = [];
-  const max = Math.max(enToKo.length, koToEn.length);
-  for (let i = 0; i < max; i++) {
-    if (i < enToKo.length) pool.push(enToKo[i]);
-    if (i < koToEn.length) pool.push(koToEn[i]);
-  }
-
-  localStorage.setItem('vf_quiz_pool', JSON.stringify(pool));
-  localStorage.setItem('vf_quiz_pool_date', todayNoonStr);
-  return pool;
-}
-
-// ═══════════════════════════════════════
-// KRDict API
-// ═══════════════════════════════════════
-function getApiKey() {
-  return localStorage.getItem('vf_krdict_key') || '';
-}
-
-function saveApiKey() {
-  const input = document.getElementById('krdict-key-input');
-  const key = input?.value.trim();
-  if (!key) { showToast('API 키를 입력해주세요'); return; }
-  localStorage.setItem('vf_krdict_key', key);
-  const status = document.getElementById('api-key-status');
-  if (status) status.style.display = 'block';
-  showToast('API 키가 저장됐어요 ✓');
-}
-
-async function translateWord(word) {
+// ── Dictionary API (Free Dictionary + MyMemory) ──
+async function lookupWord(word) {
   const w = word.toLowerCase().trim();
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('API_KEY_MISSING');
+  let meanings = [], example = '';
 
-  let res, text;
   try {
-    res = await fetch('https://vocabflix-api.bbnn47.workers.dev', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: w, apiKey })
-    });
-    text = await res.text();
-  } catch(e) {
-    throw new Error('NETWORK_ERROR: ' + e.message);
-  }
-
-  if (!res.ok) throw new Error('WORKER_ERROR_' + res.status + ': ' + text.slice(0, 100));
-
-  // XML 파싱
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, 'text/xml');
-
-  // 에러 체크
-  const errorEl = xml.querySelector('error');
-  if (errorEl) throw new Error('KRDICT_ERROR: ' + errorEl.textContent);
-
-  const items = xml.querySelectorAll('item');
-  if (!items.length) throw new Error('NO_RESULTS: ' + text.slice(0, 200));
-
-  const meanings = [];
-  let example = '';
-  const nums = ['①','②','③','④','⑤'];
-
-  for (const item of items) {
-    const pos = item.querySelector('pos')?.textContent || '';
-    const senses = item.querySelectorAll('sense');
-    for (const sense of senses) {
-      const transWord = sense.querySelector('trans_word')?.textContent || '';
-      const transDfn = sense.querySelector('trans_dfn')?.textContent || '';
-      const koMeaning = transWord || transDfn;
-      if (koMeaning) {
-        meanings.push({ pos, ko: koMeaning });
-        if (!example) {
-          const exText = sense.querySelector('example')?.textContent || '';
-          if (exText) example = exText.slice(0, 100);
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(w)}`);
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      for (const m of data[0].meanings) {
+        for (const d of m.definitions.slice(0,2)) {
+          try {
+            const tr = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(d.definition.slice(0,100))}&langpair=en|ko`);
+            const td = await tr.json();
+            const ko = td.responseData?.translatedText || '';
+            if (ko) meanings.push({pos:m.partOfSpeech, ko});
+          } catch(e) {}
+          if (!example && d.example) example = d.example.slice(0,100);
+          if (meanings.length >= 3) break;
         }
+        if (meanings.length >= 3) break;
       }
-      if (meanings.length >= 4) break;
     }
-    if (meanings.length >= 4) break;
+  } catch(e) {}
+
+  if (!meanings.length) {
+    const tr = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(w)}&langpair=en|ko`);
+    const td = await tr.json();
+    const ko = td.responseData?.translatedText || '';
+    if (!ko) throw new Error('검색 실패');
+    meanings.push({pos:'', ko});
   }
 
-  if (!meanings.length) throw new Error('NO_MEANINGS: ' + text.slice(0, 200));
-
+  const posMap = {noun:'명사',verb:'동사',adjective:'형용사',adverb:'부사',pronoun:'대명사',interjection:'감탄사'};
+  const nums = ['①','②','③'];
   const meaning_ko = meanings.length > 1
-    ? meanings.map((m, i) => `${nums[i]} ${m.pos ? `[${m.pos}] ` : ''}${m.ko}`).join('\n')
+    ? meanings.map((m,i)=>`${nums[i]} ${posMap[m.pos]?`[${posMap[m.pos]}] `:''}${m.ko}`).join('\n')
     : meanings[0].ko;
 
-  return { word: w, meaning_ko, pos: meanings[0]?.pos || '', example, meanings };
+  return {word:w, meaning_ko, pos:meanings[0]?.pos||'', example};
 }
 
-// ═══════════════════════════════════════
-// SEARCH & PREVIEW
-// ═══════════════════════════════════════
+// ── Search & Preview ──
 let pendingWord = null;
-
 async function searchWord() {
   const input = document.getElementById('word-input');
   const btn = document.getElementById('search-btn');
-  const previewArea = document.getElementById('preview-area');
+  const area = document.getElementById('preview-area');
   const word = input.value.trim();
   if (!word) return;
-
   const words = await loadWords();
-  if (words.find(w => w.word.toLowerCase() === word.toLowerCase())) {
-    showToast('이미 저장된 단어예요!'); return;
-  }
-
-  btn.disabled = true; btn.textContent = '...';
-  previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--muted)"><span class="loading-dots">번역 중</span></div>`;
-
+  if (words.find(w=>w.word.toLowerCase()===word.toLowerCase())) { showToast('이미 저장된 단어예요!'); return; }
+  btn.disabled=true; btn.textContent='...';
+  area.innerHTML=`<div style="margin-top:14px;font-size:13px;color:var(--muted)"><span class="loading-dots">검색 중</span></div>`;
   try {
-    const info = await translateWord(word);
-    pendingWord = {
-      id: Date.now(),
-      word: info.word,
-      meaning_ko: info.meaning_ko,
-      pos: info.pos,
-      example: info.example,
-      addedAt: Date.now(),
-      completedSteps: [],
-      wrongCount: 0,
-      lastWrongAt: null
-    };
-
-    previewArea.innerHTML = `
+    const info = await lookupWord(word);
+    pendingWord = {id:Date.now(), word:info.word, meaning_ko:info.meaning_ko, pos:info.pos, example:info.example, addedAt:Date.now(), completedSteps:[], wrongCount:0, lastWrongAt:null};
+    area.innerHTML = `
       <div class="preview-card">
         <div class="preview-word">${pendingWord.word}</div>
-        <button class="speak-btn" onclick="speak('${pendingWord.word}', this)">🔊 발음 듣기</button>
-        ${pendingWord.pos ? `<div class="preview-pos" style="margin-top:8px">${pendingWord.pos}</div>` : ''}
-        <div class="preview-meaning" style="white-space:pre-line;font-size:15px;line-height:1.8;margin-top:10px">${pendingWord.meaning_ko}</div>
-        ${pendingWord.example ? `<div class="preview-example">"${pendingWord.example}"</div>` : ''}
+        <button class="speak-btn" onclick="speak('${pendingWord.word}',this)">🔊 발음 듣기</button>
+        ${pendingWord.pos?`<div class="preview-pos" style="margin-top:8px">${pendingWord.pos}</div>`:''}
+        <div class="preview-meaning">${pendingWord.meaning_ko}</div>
+        ${pendingWord.example?`<div class="preview-example">"${pendingWord.example}"</div>`:''}
         <div style="margin-top:14px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">✏️ 뜻 직접 입력 (비워두면 위 뜻으로 저장)</div>
-          <input type="text" id="custom-meaning" placeholder="내가 원하는 뜻으로 바꿀 수 있어요" autocomplete="off">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">✏️ 뜻 직접 수정 (선택사항)</div>
+          <input type="text" id="custom-meaning" placeholder="원하는 뜻으로 바꿔서 저장할 수 있어요" autocomplete="off">
         </div>
         <div class="preview-actions">
           <button class="btn btn-green btn-bebas" onclick="confirmAdd()">✓ 단어장 추가</button>
@@ -578,191 +358,139 @@ async function searchWord() {
         </div>
       </div>`;
   } catch(e) {
-    const noKey = !getApiKey();
-    previewArea.innerHTML = `<div style="margin-top:14px;font-size:13px;color:var(--red)">
-      ${noKey
-        ? '⚙️ 설정 탭에서 KRDict API 키를 먼저 입력해주세요!'
-        : '검색 실패: ' + e.message}
-    </div>`;
+    area.innerHTML=`<div style="margin-top:14px;font-size:13px;color:var(--red)">검색 실패. 영어 단어인지 확인해주세요.</div>`;
   }
-  btn.disabled = false; btn.textContent = '검색';
+  btn.disabled=false; btn.textContent='검색';
 }
 
 async function confirmAdd() {
   if (!pendingWord) return;
-  const customMeaning = document.getElementById('custom-meaning')?.value.trim();
-  if (customMeaning) pendingWord.meaning_ko = customMeaning;
+  const custom = document.getElementById('custom-meaning')?.value.trim();
+  if (custom) pendingWord.meaning_ko = custom;
   await dbPut(pendingWord);
-  pendingWord = null;
-  document.getElementById('word-input').value = '';
-  document.getElementById('preview-area').innerHTML = '';
+  pendingWord=null;
+  document.getElementById('word-input').value='';
+  document.getElementById('preview-area').innerHTML='';
   showToast('단어장에 추가됐어요 ✓');
   await refreshAll();
 }
-
 function cancelAdd() {
-  pendingWord = null;
-  document.getElementById('word-input').value = '';
-  document.getElementById('preview-area').innerHTML = '';
+  pendingWord=null;
+  document.getElementById('word-input').value='';
+  document.getElementById('preview-area').innerHTML='';
   showToast('추가하지 않았어요');
 }
 
-async function manualAdd() {
-  const wordEl = document.getElementById('manual-word');
-  const meaningEl = document.getElementById('manual-meaning');
-  const exampleEl = document.getElementById('manual-example');
-  const word = wordEl.value.trim().toLowerCase();
-  const meaning = meaningEl.value.trim();
-  if (!word || !meaning) { showToast('단어와 뜻을 모두 입력해주세요'); return; }
-
-  const words = await loadWords();
-  if (words.find(w => w.word === word)) { showToast('이미 저장된 단어예요!'); return; }
-
-  await dbPut({
-    id: Date.now(), word, meaning_ko: meaning,
-    pos: '', example: exampleEl.value.trim(),
-    addedAt: Date.now(), completedSteps: [], wrongCount: 0, lastWrongAt: null
-  });
-  wordEl.value = ''; meaningEl.value = ''; exampleEl.value = '';
-  showToast(`"${word}" 저장됐어요 ✓`);
-  await refreshAll();
-}
-
-// ═══════════════════════════════════════
-// SPEECH (Web Speech API)
-// ═══════════════════════════════════════
-function speak(word, btnEl) {
-  if (!('speechSynthesis' in window)) { showToast('이 기기는 발음 기능을 지원하지 않아요'); return; }
+// ── Speech ──
+function speak(word, btn) {
+  if (!('speechSynthesis' in window)) { showToast('발음 기능을 지원하지 않아요'); return; }
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(word);
-  utter.lang = 'en-US';
-  utter.rate = 0.9;
-  if (btnEl) {
-    btnEl.classList.add('speaking');
-    btnEl.textContent = '🔊 재생 중...';
-    utter.onend = () => { btnEl.classList.remove('speaking'); btnEl.innerHTML = '🔊 발음 듣기'; };
-    utter.onerror = () => { btnEl.classList.remove('speaking'); btnEl.innerHTML = '🔊 발음 듣기'; };
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang='en-US'; u.rate=0.9;
+  if (btn) {
+    btn.textContent='🔊 재생 중...';
+    u.onend = () => btn.textContent='🔊 발음 듣기';
+    u.onerror = () => btn.textContent='🔊 발음 듣기';
   }
-  window.speechSynthesis.speak(utter);
+  window.speechSynthesis.speak(u);
 }
 
-// ═══════════════════════════════════════
-// STATS & RECENT
-// ═══════════════════════════════════════
+// ── Stats ──
 async function updateStats() {
   const words = await loadWords();
   const due = await getDueItems();
-  const dueUniq = [...new Set(due.map(d => d.word.id))].length;
-  const wrongWords = words.filter(w => (w.wrongCount || 0) >= 5);
-  const done = words.filter(w => (w.completedSteps||[]).length >= BASE_INTERVALS.length);
-
-  document.getElementById('s-total').textContent = words.length;
-  document.getElementById('s-due').textContent = dueUniq;
-  document.getElementById('s-wrong').textContent = wrongWords.length;
-  document.getElementById('s-done').textContent = done.length;
-
-  const wrongBadge = document.getElementById('wrong-badge');
-  if (wrongWords.length > 0) {
-    wrongBadge.textContent = wrongWords.length;
-    wrongBadge.style.display = 'inline-block';
-  } else {
-    wrongBadge.style.display = 'none';
-  }
+  const dueUniq = [...new Set(due.map(d=>d.word.id))].length;
+  const wrongWords = words.filter(w=>(w.wrongCount||0)>=5);
+  const done = words.filter(w=>(w.completedSteps||[]).length>=INTERVALS.length);
+  document.getElementById('s-total').textContent=words.length;
+  document.getElementById('s-due').textContent=dueUniq;
+  document.getElementById('s-wrong').textContent=wrongWords.length;
+  document.getElementById('s-done').textContent=done.length;
+  document.getElementById('due-badge').textContent=dueUniq>0?`퀴즈 ${dueUniq}개`:'';
+  const wb=document.getElementById('wrong-badge');
+  wb.textContent=wrongWords.length; wb.style.display=wrongWords.length?'inline-block':'none';
 }
 
 async function renderRecent() {
-  const words = (await loadWords()).slice(0, 5);
-  const el = document.getElementById('recent-list');
-  if (!words.length) { el.innerHTML = '<div class="empty">아직 저장된 단어가 없어요<br>첫 단어를 추가해보세요!</div>'; return; }
-  el.innerHTML = words.map(w => `
+  const words=(await loadWords()).slice(0,5);
+  const el=document.getElementById('recent-list');
+  if (!words.length) { el.innerHTML='<div class="empty">아직 저장된 단어가 없어요<br>첫 단어를 추가해보세요!</div>'; return; }
+  el.innerHTML=words.map(w=>`
     <div class="word-item">
-      <div class="word-main">
-        <div class="word-en">${w.word}</div>
-        <div class="word-ko">${w.meaning_ko}</div>
-      </div>
-      ${(w.wrongCount||0) > 0 ? `<span class="badge wrong">오답 ${w.wrongCount}회</span>` : ''}
+      <div class="word-main"><div class="word-en">${w.word}</div><div class="word-ko">${w.meaning_ko.split('\n')[0]}</div></div>
+      ${(w.wrongCount||0)>0?`<span class="badge wrong">오답 ${w.wrongCount}회</span>`:''}
       <span class="badge">${new Date(w.addedAt).toLocaleDateString('ko')}</span>
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════
-let quizPool = [];
-let quizIndex = 0;
-let quizAnswered = false;
-let quizSessionDone = false;
+// ── Quiz ──
+let quizPool=[], quizIndex=0, quizAnswered=false;
+
+async function buildQuizPool() {
+  const now = new Date();
+  const todayStr = now.toDateString();
+  const todayNoonStr = `${todayStr}_noon`;
+  if (localStorage.getItem('vf_quiz_done')===todayStr) return [];
+  if (now.getHours()<12) return null;
+  const cached=localStorage.getItem('vf_quiz_pool');
+  const cachedDate=localStorage.getItem('vf_quiz_pool_date');
+  if (cached && cachedDate===todayNoonStr) return JSON.parse(cached);
+
+  const due = await getDueItems();
+  const seenE=new Set(), seenK=new Set(), enToKo=[], koToEn=[];
+  for (const d of due) {
+    if (d.type==='en_to_ko' && !seenE.has(d.word.id)) { seenE.add(d.word.id); enToKo.push(d); if(enToKo.length>=10) break; }
+  }
+  for (const d of due) {
+    if (d.type==='ko_to_en' && !seenK.has(d.word.id)) { seenK.add(d.word.id); koToEn.push(d); if(koToEn.length>=10) break; }
+  }
+  const pool=[];
+  const max=Math.max(enToKo.length,koToEn.length);
+  for (let i=0;i<max;i++) {
+    if (i<enToKo.length) pool.push(enToKo[i]);
+    if (i<koToEn.length) pool.push(koToEn[i]);
+  }
+  localStorage.setItem('vf_quiz_pool',JSON.stringify(pool));
+  localStorage.setItem('vf_quiz_pool_date',todayNoonStr);
+  return pool;
+}
 
 async function renderQuiz() {
-  const todayStr = new Date().toDateString();
-  const now = new Date();
-  const container = document.getElementById('quiz-container');
-
-  // 오늘 이미 완료
-  if (localStorage.getItem('vf_quiz_done') === todayStr) {
-    container.innerHTML = `
-      <div class="no-quiz">
-        <div class="icon">🏆</div>
-        <h3>오늘 복습 완료!</h3>
-        <p>오늘의 퀴즈를 모두 풀었어요.<br>내일 정오에 새 퀴즈가 생겨요!</p>
-      </div>`; return;
+  const now=new Date();
+  const todayStr=now.toDateString();
+  const container=document.getElementById('quiz-container');
+  if (localStorage.getItem('vf_quiz_done')===todayStr) {
+    container.innerHTML=`<div class="no-quiz"><div class="icon">🏆</div><h3>오늘 복습 완료!</h3><p>내일 정오에 새 퀴즈가 생겨요!</p></div>`; return;
+  }
+  if (now.getHours()<12) {
+    container.innerHTML=`<div class="no-quiz"><div class="icon">⏰</div><h3>정오부터 퀴즈 시작!</h3><p>매일 오후 12시에 퀴즈 20개가 생성돼요.</p></div>`; return;
+  }
+  if (quizIndex===0) quizPool=await buildQuizPool();
+  if (!quizPool||!quizPool.length) {
+    container.innerHTML=`<div class="no-quiz"><div class="icon">🎬</div><h3>오늘 퀴즈 없음!</h3><p>복습할 단어가 없어요.<br>단어를 추가하면 다음 날 정오부터 퀴즈가 생성돼요.</p></div>`; return;
+  }
+  if (quizIndex>=quizPool.length) {
+    localStorage.setItem('vf_quiz_done',todayStr);
+    container.innerHTML=`<div class="no-quiz"><div class="icon">🏆</div><h3>오늘 복습 완료!</h3><p>총 ${quizPool.length}문제를 풀었어요!<br>내일 정오에 새 퀴즈가 생겨요.</p></div>`; return;
   }
 
-  // 정오 이전
-  if (now.getHours() < 12) {
-    container.innerHTML = `
-      <div class="no-quiz">
-        <div class="icon">⏰</div>
-        <h3>정오부터 퀴즈 시작!</h3>
-        <p>매일 오후 12시에 퀴즈 20개가 생성돼요.<br>그 전까지 단어를 추가해두세요!</p>
-      </div>`; return;
-  }
+  const item=quizPool[quizIndex];
+  const w=item.word, type=item.type;
+  quizAnswered=false;
+  const pct=Math.round((quizIndex/quizPool.length)*100);
 
-  // 첫 진입 시 풀 생성
-  if (quizIndex === 0) {
-    quizPool = await buildQuizPool();
-  }
-
-  if (!quizPool || !quizPool.length) {
-    container.innerHTML = `
-      <div class="no-quiz">
-        <div class="icon">🎬</div>
-        <h3>오늘 퀴즈 없음!</h3>
-        <p>복습할 단어가 없어요.<br>단어를 추가하면 다음 날 정오부터<br>퀴즈가 생성돼요.</p>
-      </div>`; return;
-  }
-
-  if (quizIndex >= quizPool.length) {
-    localStorage.setItem('vf_quiz_done', todayStr);
-    container.innerHTML = `
-      <div class="no-quiz">
-        <div class="icon">🏆</div>
-        <h3>오늘 복습 완료!</h3>
-        <p>총 ${quizPool.length}문제를 풀었어요.<br>내일 정오에 새 퀴즈가 생겨요!</p>
-      </div>`; return;
-  }
-
-  const item = quizPool[quizIndex];
-  const w = item.word;
-  const type = item.type;
-  quizAnswered = false;
-  const pct = Math.round((quizIndex / quizPool.length) * 100);
-
-  container.innerHTML = `
-    <div class="quiz-progress">
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <div class="progress-label">${quizIndex + 1} / ${quizPool.length}</div>
-    </div>
+  container.innerHTML=`
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="progress-label">${quizIndex+1} / ${quizPool.length}</div>
     <div class="quiz-wrap">
       <div class="quiz-card">
-        <div class="quiz-type-label">${type === 'en_to_ko' ? '🇺🇸 단어 → 🇰🇷 뜻' : '🇰🇷 뜻 → 🇺🇸 단어'}</div>
-        <div class="quiz-prompt ${type === 'ko_to_en' ? 'ko' : ''}">${type === 'en_to_ko' ? w.word : w.meaning_ko}</div>
-        ${type === 'en_to_ko' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
-        ${type === 'en_to_ko' && w.pos ? `<div class="quiz-pos">${w.pos}</div>` : ''}
-        ${(w.wrongCount||0) >= 3 ? `<div class="quiz-hint">⚠️ 자주 틀리는 단어예요</div>` : ''}
+        <div class="quiz-type-label">${type==='en_to_ko'?'🇺🇸 단어 → 🇰🇷 뜻':'🇰🇷 뜻 → 🇺🇸 단어'}</div>
+        <div class="quiz-prompt ${type==='ko_to_en'?'ko':''}">${type==='en_to_ko'?w.word:w.meaning_ko.split('\n')[0]}</div>
+        ${type==='en_to_ko'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+        ${(w.wrongCount||0)>=3?`<div class="quiz-hint">⚠️ 자주 틀리는 단어예요</div>`:''}
       </div>
       <div class="quiz-input-wrap">
-        <input type="text" id="quiz-ans" placeholder="${type === 'en_to_ko' ? '한국어 뜻 입력...' : '영어 단어 입력...'}" onkeydown="if(event.key==='Enter')checkAnswer()" autocomplete="off" autocorrect="off" autocapitalize="off">
+        <input type="text" id="quiz-ans" placeholder="${type==='en_to_ko'?'한국어 뜻 입력...':'영어 단어 입력...'}" onkeydown="if(event.key==='Enter')checkAnswer()" autocomplete="off" autocorrect="off" autocapitalize="off">
       </div>
       <div id="result-area"></div>
       <div class="btn-row" id="quiz-btns">
@@ -770,292 +498,181 @@ async function renderQuiz() {
         <button class="btn btn-red btn-bebas" onclick="checkAnswer()">확인</button>
       </div>
     </div>`;
-
-  setTimeout(() => { const i = document.getElementById('quiz-ans'); if(i) i.focus(); }, 100);
+  setTimeout(()=>{ const i=document.getElementById('quiz-ans'); if(i) i.focus(); },100);
 }
 
 async function checkAnswer() {
   if (quizAnswered) return;
-  const item = quizPool[quizIndex];
-  const w = item.word; const type = item.type;
-  const ansEl = document.getElementById('quiz-ans');
-  const userAns = (ansEl?.value || '').trim();
+  const item=quizPool[quizIndex];
+  const w=item.word, type=item.type;
+  const ansEl=document.getElementById('quiz-ans');
+  const userAns=(ansEl?.value||'').trim();
   if (!userAns) return;
-
-  quizAnswered = true;
-  if (ansEl) ansEl.disabled = true;
-
-  const correctRaw = type === 'en_to_ko' ? w.meaning_ko : w.word;
-
-  // 정답 보여주고 자가 채점 버튼 표시
-  document.getElementById('result-area').innerHTML = `
+  quizAnswered=true;
+  if (ansEl) ansEl.disabled=true;
+  const correctRaw=type==='en_to_ko'?w.meaning_ko:w.word;
+  document.getElementById('result-area').innerHTML=`
     <div class="quiz-result" style="background:var(--card2);border:1px solid var(--border)">
       <div style="font-size:12px;color:var(--muted);margin-bottom:6px">정답</div>
-      <div class="result-word">${correctRaw}</div>
-      ${type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
-      ${w.example ? `<div class="result-sub" style="font-style:italic;margin-top:8px">"${w.example}"</div>` : ''}
-      <div style="margin-top:6px;font-size:13px;color:var(--muted)">내 답: <span style="color:#fff">${userAns}</span></div>
+      <div class="result-word">${correctRaw.split('\n')[0]}</div>
+      ${type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+      ${w.example?`<div class="result-sub" style="font-style:italic;margin-top:8px">"${w.example}"</div>`:''}
+      <div style="margin-top:8px;font-size:13px;color:var(--muted)">내 답: <span style="color:#fff">${userAns}</span></div>
     </div>`;
-
-  // 자가 채점 버튼으로 교체 (틀렸어요 왼쪽, 맞았어요 오른쪽)
-  document.getElementById('quiz-btns').innerHTML = `
+  document.getElementById('quiz-btns').innerHTML=`
     <button class="btn btn-bebas" style="flex:1;background:#1a0808;color:#ff6666;border:1px solid #4a1a1a;font-size:18px" onclick="gradeAnswer(false)">❌ 틀렸어요</button>
     <button class="btn btn-bebas" style="flex:1;background:#081a08;color:var(--green);border:1px solid #1a4a1a;font-size:18px" onclick="gradeAnswer(true)">✅ 맞았어요</button>`;
 }
 
 async function gradeAnswer(isCorrect) {
-  const item = quizPool[quizIndex];
-  const w = item.word;
-  const correctRaw = item.type === 'en_to_ko' ? w.meaning_ko : w.word;
-
+  const item=quizPool[quizIndex];
+  const w=item.word, correctRaw=item.type==='en_to_ko'?w.meaning_ko:w.word;
   if (isCorrect) {
-    document.getElementById('result-area').innerHTML = `
+    document.getElementById('result-area').innerHTML=`
       <div class="quiz-result correct">
         <div class="result-icon">✅</div>
-        <div class="result-word">${correctRaw}</div>
-        ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
-        ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
+        <div class="result-word">${correctRaw.split('\n')[0]}</div>
+        ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+        ${w.example?`<div class="result-sub" style="font-style:italic">"${w.example}"</div>`:''}
       </div>`;
-    const words = await loadWords();
-    const word = words.find(x => x.id === w.id);
-    if (word) {
-      if (!word.completedSteps) word.completedSteps = [];
-      word.completedSteps.push(word.completedSteps.length);
-      await dbPut(word);
-    }
+    const words=await loadWords();
+    const word=words.find(x=>x.id===w.id);
+    if (word) { if(!word.completedSteps) word.completedSteps=[]; word.completedSteps.push(word.completedSteps.length); await dbPut(word); }
     showToast('정답! 🎉');
   } else {
-    document.getElementById('result-area').innerHTML = `
+    document.getElementById('result-area').innerHTML=`
       <div class="quiz-result wrong">
         <div class="result-icon">❌</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
-        <div class="result-word">${correctRaw}</div>
-        ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
-        ${w.example ? `<div class="result-sub" style="font-style:italic">"${w.example}"</div>` : ''}
+        <div class="result-word">${correctRaw.split('\n')[0]}</div>
+        ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
       </div>`;
-    const words = await loadWords();
-    const word = words.find(x => x.id === w.id);
-    if (word) {
-      word.wrongCount = (word.wrongCount || 0) + 1;
-      word.lastWrongAt = Date.now();
-      await dbPut(word);
-      if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
-      else showToast('오답 처리됐어요');
-    }
+    const words=await loadWords();
+    const word=words.find(x=>x.id===w.id);
+    if (word) { word.wrongCount=(word.wrongCount||0)+1; word.lastWrongAt=Date.now(); await dbPut(word); if(word.wrongCount===5) showToast('⚠️ 오답 단어장에 등록됐어요'); else showToast('오답 처리됐어요'); }
   }
-
-  // 다음 버튼으로 교체
-  document.getElementById('quiz-btns').innerHTML = `
-    <button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
-
+  document.getElementById('quiz-btns').innerHTML=`<button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
   await updateStats();
 }
 
 async function skipQuiz() {
   if (quizAnswered) { quizIndex++; renderQuiz(); return; }
-  const item = quizPool[quizIndex];
-  const w = item.word;
-  const correctRaw = item.type === 'en_to_ko' ? w.meaning_ko : w.word;
-  quizAnswered = true;
-
-  document.getElementById('result-area').innerHTML = `
+  const item=quizPool[quizIndex];
+  const w=item.word, correctRaw=item.type==='en_to_ko'?w.meaning_ko:w.word;
+  quizAnswered=true;
+  const ansEl=document.getElementById('quiz-ans');
+  if (ansEl) ansEl.disabled=true;
+  document.getElementById('result-area').innerHTML=`
     <div class="quiz-result wrong">
       <div class="result-icon">❌</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
-      <div class="result-word">${correctRaw}</div>
-      ${item.type === 'ko_to_en' ? `<button class="speak-btn" onclick="speak('${w.word}', this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>` : ''}
-      ${w.example ? `<div class="result-sub" style="font-style:italic;margin-top:8px">"${w.example}"</div>` : ''}
+      <div class="result-word">${correctRaw.split('\n')[0]}</div>
+      ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
     </div>`;
-
-  // 다음 버튼으로 교체
-  document.getElementById('quiz-btns').innerHTML = `
-    <button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
-
-  const ansEl = document.getElementById('quiz-ans');
-  if (ansEl) ansEl.disabled = true;
-
-  const words = await loadWords();
-  const word = words.find(x => x.id === w.id);
-  if (word) {
-    word.wrongCount = (word.wrongCount || 0) + 1;
-    word.lastWrongAt = Date.now();
-    await dbPut(word);
-    if (word.wrongCount === 5) showToast('⚠️ 오답 단어장에 등록됐어요');
-    else showToast('오답 처리됐어요');
-  }
+  document.getElementById('quiz-btns').innerHTML=`<button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
+  const words=await loadWords();
+  const word=words.find(x=>x.id===w.id);
+  if (word) { word.wrongCount=(word.wrongCount||0)+1; word.lastWrongAt=Date.now(); await dbPut(word); if(word.wrongCount===5) showToast('⚠️ 오답 단어장에 등록됐어요'); else showToast('오답 처리됐어요'); }
   await updateStats();
 }
 
-// ═══════════════════════════════════════
-// WORD LIST
-// ═══════════════════════════════════════
+// ── Word List ──
 async function renderWords() {
-  const words = await loadWords();
-  const container = document.getElementById('words-container');
-  if (!words.length) { container.innerHTML = '<div class="empty">저장된 단어가 없어요</div>'; return; }
-
-  const due = await getDueItems();
-  const dueIds = new Set(due.map(d => d.word.id));
-
-  container.innerHTML = `<div class="section-title">${words.length}개 단어</div>` +
-    words.map(w => {
-      const wc = w.wrongCount || 0;
-      const isDanger = wc >= 5;
-      const isDue = dueIds.has(w.id);
-      const allDone = (w.completedSteps||[]).length >= BASE_INTERVALS.length;
-      const badge = allDone ? '<span class="badge" style="color:var(--green);background:#081a08">완료 ✓</span>'
-        : isDue ? '<span class="badge" style="color:var(--yellow);background:#1a1400">복습 !</span>'
-        : '<span class="badge">대기</span>';
-      return `
-        <div class="word-item ${isDanger?'danger':''}">
-          <div class="word-main">
-            <div class="word-en">${w.word} ${isDanger?'⚠️':''}</div>
-            <div class="word-ko">${w.meaning_ko}</div>
-            ${w.example?`<div class="word-ex">${w.example}</div>`:''}
-          </div>
-          ${wc > 0 ? `<span class="badge ${isDanger?'danger':'wrong'}">${isDanger?'오답5+':'오답'+wc}</span>` : ''}
-          ${badge}
-          <button class="del-btn" onclick="deleteWord(${w.id})">✕</button>
-        </div>`;
+  const words=await loadWords();
+  const container=document.getElementById('words-container');
+  if (!words.length) { container.innerHTML='<div class="empty">저장된 단어가 없어요</div>'; return; }
+  const due=await getDueItems();
+  const dueIds=new Set(due.map(d=>d.word.id));
+  container.innerHTML=`<div class="section-title">${words.length}개 단어</div>`+
+    words.map(w=>{
+      const wc=w.wrongCount||0, isDanger=wc>=5, isDue=dueIds.has(w.id);
+      const allDone=(w.completedSteps||[]).length>=INTERVALS.length;
+      const badge=allDone?'<span class="badge" style="color:var(--green);background:#081a08">완료 ✓</span>'
+        :isDue?'<span class="badge" style="color:var(--yellow);background:#1a1400">복습 !</span>'
+        :'<span class="badge">대기</span>';
+      return `<div class="word-item ${isDanger?'danger':''}">
+        <div class="word-main">
+          <div class="word-en">${w.word}${isDanger?' ⚠️':''}</div>
+          <div class="word-ko">${w.meaning_ko.split('\n')[0]}</div>
+          ${w.example?`<div class="word-ex">${w.example}</div>`:''}
+        </div>
+        ${wc>0?`<span class="badge ${isDanger?'danger':'wrong'}">${isDanger?'오답5+':'오답'+wc}</span>`:''}
+        ${badge}
+        <button class="del-btn" onclick="deleteWord(${w.id})">✕</button>
+      </div>`;
     }).join('');
 }
 
 async function deleteWord(id) {
   if (!confirm('단어를 삭제할까요?')) return;
-  await dbDel(id);
-  await renderWords();
-  await refreshAll();
-  showToast('삭제됐어요');
+  await dbDel(id); await renderWords(); await refreshAll(); showToast('삭제됐어요');
 }
 
-// ═══════════════════════════════════════
-// WRONG WORDS PAGE
-// ═══════════════════════════════════════
+// ── Wrong Words ──
 async function renderWrong() {
-  const words = await loadWords();
-  const wrong = words.filter(w => (w.wrongCount||0) >= 5).sort((a,b) => (b.wrongCount||0) - (a.wrongCount||0));
-  const container = document.getElementById('wrong-container');
-
-  container.innerHTML = `
-    <div class="wrong-header">
-      <div class="wrong-icon">❌</div>
-      <div class="wrong-info">
-        <h3>오답 단어장</h3>
-        <p>5회 이상 틀린 단어 ${wrong.length}개</p>
-      </div>
-    </div>`;
-
-  if (!wrong.length) {
-    container.innerHTML += '<div class="empty">오답 단어가 없어요!<br>계속 잘 하고 있어요 🎉</div>';
-    return;
-  }
-
-  container.innerHTML += wrong.map(w => `
+  const words=await loadWords();
+  const wrong=words.filter(w=>(w.wrongCount||0)>=5).sort((a,b)=>(b.wrongCount||0)-(a.wrongCount||0));
+  const container=document.getElementById('wrong-container');
+  container.innerHTML=`<div class="wrong-header"><div style="font-size:32px">❌</div><div><h3 style="font-size:15px;font-weight:600">오답 단어장</h3><p style="font-size:12px;color:var(--muted)">5회 이상 틀린 단어 ${wrong.length}개</p></div></div>`;
+  if (!wrong.length) { container.innerHTML+='<div class="empty">오답 단어가 없어요!<br>계속 잘 하고 있어요 🎉</div>'; return; }
+  container.innerHTML+=wrong.map(w=>`
     <div class="word-item danger">
-      <div class="word-main">
-        <div class="word-en">${w.word}</div>
-        <div class="word-ko">${w.meaning_ko}</div>
-        ${w.example?`<div class="word-ex">${w.example}</div>`:''}
-      </div>
+      <div class="word-main"><div class="word-en">${w.word}</div><div class="word-ko">${w.meaning_ko.split('\n')[0]}</div></div>
       <span class="badge danger">오답 ${w.wrongCount}회</span>
       <button class="del-btn" onclick="deleteWord(${w.id})">✕</button>
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════
-// SETTINGS
-// ═══════════════════════════════════════
-function saveNotifTime() {
-  const t = document.getElementById('notif-time');
-  if (t) localStorage.setItem('vf_notif_time', t.value);
-}
-
-// ═══════════════════════════════════════
-// BACKUP
-// ═══════════════════════════════════════
+// ── Backup ──
 async function exportData() {
-  const words = await loadWords();
+  const words=await loadWords();
   if (!words.length) { showToast('저장된 단어가 없어요'); return; }
-  const json = JSON.stringify({ version: 3, exportedAt: new Date().toISOString(), words }, null, 2);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-  a.download = `vocabflix_${new Date().toLocaleDateString('ko').replace(/\./g,'-').trim()}.json`;
-  a.click();
-  showToast(`${words.length}개 단어 내보내기 완료!`);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({version:3,words},null,2)],{type:'application/json'}));
+  a.download=`vocabflix_${new Date().toLocaleDateString('ko').replace(/\./g,'-').trim()}.json`;
+  a.click(); showToast(`${words.length}개 단어 내보내기 완료!`);
 }
-
 async function importData(e) {
-  const file = e.target.files[0]; if (!file) return;
+  const file=e.target.files[0]; if(!file) return;
   try {
-    const data = JSON.parse(await file.text());
-    const words = data.words || data;
-    let added = 0;
-    for (const w of words) { if (w.id && w.word) { await dbPut(w); added++; } }
-    await refreshAll();
-    showToast(`${added}개 단어 불러오기 완료!`);
+    const data=JSON.parse(await file.text());
+    const words=data.words||data; let added=0;
+    for (const w of words) { if(w.id&&w.word) { await dbPut(w); added++; } }
+    await refreshAll(); showToast(`${added}개 단어 불러오기 완료!`);
   } catch { showToast('파일 형식이 올바르지 않아요'); }
-  e.target.value = '';
+  e.target.value='';
 }
-
 async function resetAll() {
   if (!confirm('정말 모든 데이터를 삭제할까요?')) return;
-  const words = await loadWords();
+  const words=await loadWords();
   for (const w of words) await dbDel(w.id);
-  await refreshAll();
-  showToast('초기화됐어요');
+  await refreshAll(); showToast('초기화됐어요');
 }
 
-// ═══════════════════════════════════════
-// NAV
-// ═══════════════════════════════════════
+// ── Nav ──
 function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   if (btn) btn.classList.add('active');
-
-  if (name === 'quiz') { quizIndex = 0; renderQuiz(); }
-  if (name === 'words') renderWords();
-  if (name === 'wrong') renderWrong();
-  if (name === 'settings') {
-    const saved = getApiKey();
-    const input = document.getElementById('krdict-key-input');
-    const status = document.getElementById('api-key-status');
-    if (saved && input) {
-      input.placeholder = '저장됨 ✓ (변경하려면 새 키 입력)';
-      if (status) status.style.display = 'block';
-    }
-  }
+  if (name==='quiz') { quizIndex=0; renderQuiz(); }
+  if (name==='words') renderWords();
+  if (name==='wrong') renderWrong();
   updateStats();
 }
 
-// ═══════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════
+// ── Toast ──
 let toastTimer;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ═══════════════════════════════════════
-// REFRESH ALL
-// ═══════════════════════════════════════
-async function refreshAll() {
-  await updateStats();
-  await renderRecent();
-}
-
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
-async function init() {
-  await openDB();
-  await refreshAll();
-}
-
+// ── Refresh & Init ──
+async function refreshAll() { await updateStats(); await renderRecent(); }
+async function init() { await openDB(); await refreshAll(); }
 init();
 </script>
 </body>
