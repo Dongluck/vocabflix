@@ -267,8 +267,9 @@ input[type="text"]::placeholder { color: #444; }
 <div id="page-settings" class="page">
   <div class="card">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px">🔑 KRDict API 키</div>
-    <input type="password" id="krdict-key-input" placeholder="API 키 입력" style="margin-bottom:10px" autocomplete="off">
+    <input type="text" id="krdict-key-input" placeholder="API 키 입력" style="margin-bottom:10px" autocomplete="off" autocorrect="off" autocapitalize="off">
     <button class="btn btn-red btn-full" onclick="saveApiKey()">저장</button>
+    <div id="api-key-status" style="font-size:12px;color:var(--green);margin-top:8px;display:none">저장됨 ✓</div>
     <div style="font-size:11px;color:#444;margin-top:10px;line-height:1.6">
       krdict.korean.go.kr → 오픈 API → API 키 발급 (무료)<br>
       키는 이 기기에만 저장되며 외부로 전송되지 않아요.
@@ -455,9 +456,12 @@ function getApiKey() {
 }
 
 function saveApiKey() {
-  const key = document.getElementById('krdict-key-input').value.trim();
+  const input = document.getElementById('krdict-key-input');
+  const key = input?.value.trim();
   if (!key) { showToast('API 키를 입력해주세요'); return; }
   localStorage.setItem('vf_krdict_key', key);
+  const status = document.getElementById('api-key-status');
+  if (status) status.style.display = 'block';
   showToast('API 키가 저장됐어요 ✓');
 }
 
@@ -1004,7 +1008,11 @@ function showPage(name, btn) {
   if (name === 'settings') {
     const saved = getApiKey();
     const input = document.getElementById('krdict-key-input');
-    if (input && saved) input.placeholder = '저장됨 ✓ (변경하려면 새 키 입력)';
+    const status = document.getElementById('api-key-status');
+    if (saved && input) {
+      input.placeholder = '저장됨 ✓ (변경하려면 새 키 입력)';
+      if (status) status.style.display = 'block';
+    }
   }
   updateStats();
 }
