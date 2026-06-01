@@ -518,7 +518,8 @@ async function renderQuiz() {
     container.innerHTML=`<div class="no-quiz"><div class="icon">🏆</div><h3>오늘 복습 완료!</h3><p>내일 정오에 새 퀴즈가 생겨요!</p></div>`; return;
   }
   if (now.getHours()<12) {
-    container.innerHTML=`<div class="no-quiz"><div class="icon">⏰</div><h3>정오부터 퀴즈 시작!</h3><p>매일 오후 12시에 퀴즈 20개가 생성돼요.</p></div>`; return;
+    const {en,ko}=getQuizCount();
+    container.innerHTML=`<div class="no-quiz"><div class="icon">⏰</div><h3>정오부터 퀴즈 시작!</h3><p>매일 오후 12시에 퀴즈 ${en+ko}개가 생성돼요.</p></div>`; return;
   }
   if (quizIndex===0) quizPool=await buildQuizPool();
   if (!quizPool||!quizPool.length) {
@@ -541,7 +542,7 @@ async function renderQuiz() {
       <div class="quiz-card">
         <div class="quiz-type-label">${type==='en_to_ko'?'🇺🇸 단어 → 🇰🇷 뜻':'🇰🇷 뜻 → 🇺🇸 단어'}</div>
         <div class="quiz-prompt ${type==='ko_to_en'?'ko':''}">${type==='en_to_ko'?w.word:w.meaning_ko.split('\n')[0]}</div>
-        ${type==='en_to_ko'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+        ${type==='en_to_ko'?`<button class="speak-btn" id="quiz-speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
         ${(w.wrongCount||0)>=3?`<div class="quiz-hint">⚠️ 자주 틀리는 단어예요</div>`:''}
       </div>
       <div class="quiz-input-wrap">
@@ -553,7 +554,11 @@ async function renderQuiz() {
         <button class="btn btn-red btn-bebas" onclick="checkAnswer()">확인</button>
       </div>
     </div>`;
-  setTimeout(()=>{ const i=document.getElementById('quiz-ans'); if(i) i.focus(); },100);
+  setTimeout(()=>{
+    const i=document.getElementById('quiz-ans'); if(i) i.focus();
+    // 영→한 퀴즈면 발음 자동 재생
+    if (type==='en_to_ko') speak(w.word, document.getElementById('quiz-speak-btn'));
+  },100);
 }
 
 async function checkAnswer() {
@@ -587,7 +592,7 @@ async function gradeAnswer(isCorrect) {
       <div class="quiz-result correct">
         <div class="result-icon">✅</div>
         <div class="result-word">${correctRaw.split('\n')[0]}</div>
-        ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+        ${item.type==='ko_to_en'?`<button class="speak-btn" id="result-speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
         ${w.example?`<div class="result-sub" style="font-style:italic">"${w.example}"</div>`:''}
       </div>`;
     const words=await loadWords();
@@ -600,18 +605,21 @@ async function gradeAnswer(isCorrect) {
         <div class="result-icon">❌</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
         <div class="result-word">${correctRaw.split('\n')[0]}</div>
-        ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+        ${item.type==='ko_to_en'?`<button class="speak-btn" id="result-speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
       </div>`;
     const words=await loadWords();
     const word=words.find(x=>x.id===w.id);
     if (word) { word.wrongCount=(word.wrongCount||0)+1; word.lastWrongAt=Date.now(); await dbPut(word); if(word.wrongCount===5) showToast('⚠️ 오답 단어장에 등록됐어요'); else showToast('오답 처리됐어요'); }
   }
-  document.getElementById('quiz-btns').innerHTML=`<button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
+  // 정답 표시 후 자동으로 다음 문제로 (다음 버튼 없음)
+  document.getElementById('quiz-btns').innerHTML='';
   await updateStats();
+  // 1.5초 후 자동으로 다음 문제
+  setTimeout(()=>{ quizIndex++; renderQuiz(); }, 1500);
 }
 
 async function skipQuiz() {
-  if (quizAnswered) { quizIndex++; renderQuiz(); return; }
+  if (quizAnswered) return;
   const item=quizPool[quizIndex];
   const w=item.word, correctRaw=item.type==='en_to_ko'?w.meaning_ko:w.word;
   quizAnswered=true;
@@ -622,13 +630,14 @@ async function skipQuiz() {
       <div class="result-icon">❌</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:4px">정답:</div>
       <div class="result-word">${correctRaw.split('\n')[0]}</div>
-      ${item.type==='ko_to_en'?`<button class="speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
+      ${item.type==='ko_to_en'?`<button class="speak-btn" id="result-speak-btn" onclick="speak('${w.word}',this)" style="margin:8px auto 0;display:flex">🔊 발음 듣기</button>`:''}
     </div>`;
-  document.getElementById('quiz-btns').innerHTML=`<button class="btn btn-red btn-bebas btn-full" onclick="quizIndex++;renderQuiz()">다음 →</button>`;
+  document.getElementById('quiz-btns').innerHTML='';
   const words=await loadWords();
   const word=words.find(x=>x.id===w.id);
   if (word) { word.wrongCount=(word.wrongCount||0)+1; word.lastWrongAt=Date.now(); await dbPut(word); if(word.wrongCount===5) showToast('⚠️ 오답 단어장에 등록됐어요'); else showToast('오답 처리됐어요'); }
   await updateStats();
+  setTimeout(()=>{ quizIndex++; renderQuiz(); }, 1500);
 }
 
 // ── Word List ──
@@ -710,7 +719,7 @@ function showPage(name, btn) {
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name==='quiz') { quizIndex=0; renderQuiz(); }
+  if (name==='quiz') renderQuiz(); // quizIndex 초기화 안 함
   if (name==='words') renderWords();
   if (name==='wrong') renderWrong();
   if (name==='settings') loadCountSettings();
