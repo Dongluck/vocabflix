@@ -218,16 +218,13 @@ input[type="text"]::placeholder { color: #444; }
     <div style="font-size:12px;color:var(--muted);text-align:center">문제 (최대 80개)</div>
   </div>
   <div class="card">
-    <div class="section-title" style="margin-top:0">복습 스케줄</div>
-    <div style="font-size:13px;color:var(--muted);line-height:2">
-      📖 +1일 — 뜻 보고 단어 맞추기<br>
-      ✏️ +2일 — 단어 보고 뜻 맞추기<br>
-      📖 +4일 — 뜻 보고 단어 맞추기<br>
-      ✏️ +7일 — 단어 보고 뜻 맞추기<br>
-      🎯 +14일 — 랜덤 혼합<br><br>
-      <span style="color:var(--orange)">❌ 틀릴수록 출제 빈도 증가</span><br>
-      <span style="color:#ff4444">⚠️ 5회 이상 틀리면 오답 단어장 등록</span>
+    <div class="section-title" style="margin-top:0">⏰ 퀴즈 업데이트 시간</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:14px">매일 이 시간에 퀴즈가 새로 생성돼요.</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <input type="time" id="quiz-update-time" value="00:00" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:18px;padding:12px 14px;outline:none;font-family:'DM Sans',sans-serif" onchange="saveQuizUpdateTime()">
+      <button class="btn btn-red" onclick="saveQuizUpdateTime()">저장</button>
     </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px">현재 설정: <span id="current-update-time" style="color:#fff">자정 (00:00)</span></div>
   </div>
   <div class="card">
     <div class="section-title" style="margin-top:0">💾 데이터 백업</div>
@@ -402,43 +399,89 @@ async function renderRecent() {
     </div>`).join('');
 }
 
+// ── Quiz Update Time ──
+function getQuizUpdateTime() {
+  return localStorage.getItem('vf_update_time') || '00:00';
+}
+function saveQuizUpdateTime() {
+  const t = document.getElementById('quiz-update-time')?.value || '00:00';
+  localStorage.setItem('vf_update_time', t);
+  localStorage.removeItem('vf_quiz_pool');
+  localStorage.removeItem('vf_quiz_pool_date');
+  const el = document.getElementById('current-update-time');
+  if (el) el.textContent = `${t}`;
+  showToast(`퀴즈 업데이트 시간: ${t}`);
+}
+function loadQuizUpdateTime() {
+  const t = getQuizUpdateTime();
+  const input = document.getElementById('quiz-update-time');
+  const label = document.getElementById('current-update-time');
+  if (input) input.value = t;
+  if (label) label.textContent = t;
+}
+
+function getUpdateDateStr() {
+  // 오늘 업데이트 시간이 지났으면 오늘, 아니면 어제가 기준
+  const now = new Date();
+  const [h, m] = getQuizUpdateTime().split(':').map(Number);
+  const updateMinutes = h * 60 + m;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  if (nowMinutes >= updateMinutes) {
+    return now.toDateString() + '_' + getQuizUpdateTime();
+  } else {
+    const yesterday = new Date(now - 86400000);
+    return yesterday.toDateString() + '_' + getQuizUpdateTime();
+  }
+}
+
 // ── Quiz ──
 let quizPool=[], quizIndex=0, quizAnswered=false;
 
 async function buildQuizPool() {
   const now = new Date();
-  const todayStr = now.toDateString();
-  const todayNoonStr = `${todayStr}_noon`;
-  if (localStorage.getItem('vf_quiz_done')===todayStr) return [];
-  if (now.getHours()<12) return null;
-  const cached=localStorage.getItem('vf_quiz_pool');
-  const cachedDate=localStorage.getItem('vf_quiz_pool_date');
-  if (cached && cachedDate===todayNoonStr) return JSON.parse(cached);
+  const [h, m] = getQuizUpdateTime().split(':').map(Number);
+  const updateMinutes = h * 60 + m;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const due = await getDueItems();
-  const {en: enMax, ko: koMax} = getQuizCount();
-  const seenE=new Set(), seenK=new Set(), enToKo=[], koToEn=[];
-  for (const d of due) {
-    if (d.type==='en_to_ko' && !seenE.has(d.word.id)) { seenE.add(d.word.id); enToKo.push(d); if(enToKo.length>=enMax) break; }
+  // 업데이트 시간 전이면 퀴즈 없음
+  if (nowMinutes < updateMinutes) return null;
+
+  // 캐시: 오늘 업데이트 시간 이후에 이미 생성됐으면 재사용
+  const cached = localStorage.getItem('vf_quiz_pool');
+  const cachedDate = localStorage.getItem('vf_quiz_pool_date');
+  const currentDateStr = getUpdateDateStr();
+  if (cached && cachedDate === currentDateStr) return JSON.parse(cached);
+
+  const words = await loadWords();
+  const total = getTotalQuizCount();
+  const candidates = words.filter(w => !isCompleted(w));
+  if (!candidates.length) return [];
+
+  const weighted = candidates.map(w => ({
+    word: w,
+    weight: getWordWeight(w),
+    type: getNextType(w)
+  })).sort((a, b) => b.weight - a.weight);
+
+  const topN = weighted.slice(0, total);
+  for (let i = topN.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [topN[i], topN[j]] = [topN[j], topN[i]];
   }
-  for (const d of due) {
-    if (d.type==='ko_to_en' && !seenK.has(d.word.id)) { seenK.add(d.word.id); koToEn.push(d); if(koToEn.length>=koMax) break; }
-  }
-  const pool=[];
-  const max=Math.max(enToKo.length,koToEn.length);
-  for (let i=0;i<max;i++) {
-    if (i<enToKo.length) pool.push(enToKo[i]);
-    if (i<koToEn.length) pool.push(koToEn[i]);
-  }
-  localStorage.setItem('vf_quiz_pool',JSON.stringify(pool));
-  localStorage.setItem('vf_quiz_pool_date',todayNoonStr);
-  return pool;
+
+  localStorage.setItem('vf_quiz_pool', JSON.stringify(topN));
+  localStorage.setItem('vf_quiz_pool_date', currentDateStr);
+  return topN;
 }
 
 async function renderQuiz() {
   const container=document.getElementById('quiz-container');
   if (quizIndex===0) quizPool=await buildQuizPool();
 
+  if (quizPool===null) {
+    const t = getQuizUpdateTime();
+    container.innerHTML=`<div class="no-quiz"><div class="icon">⏰</div><h3>${t} 이후 퀴즈 시작!</h3><p>매일 ${t}에 퀴즈가 새로 생성돼요.</p></div>`; return;
+  }
   if (!quizPool||!quizPool.length) {
     container.innerHTML=`<div class="no-quiz"><div class="icon">🎬</div><h3>퀴즈 없음!</h3><p>저장된 단어가 없거나 모두 완료됐어요.<br>단어를 추가해보세요!</p></div>`; return;
   }
@@ -661,7 +704,7 @@ function showPage(name, btn) {
   if (name==='quiz') renderQuiz(); // quizIndex 초기화 안 함
   if (name==='words') renderWords();
   if (name==='wrong') renderWrong();
-  if (name==='settings') loadCountSettings();
+  if (name==='settings') { loadCountSettings(); loadQuizUpdateTime(); }
   updateStats();
 }
 
