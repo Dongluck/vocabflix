@@ -198,7 +198,12 @@ input[type="text"]::placeholder { color: #444; }
 <div id="page-quiz" class="page"><div id="quiz-container"></div></div>
 
 <!-- WORDS -->
-<div id="page-words" class="page"><div id="words-container"></div></div>
+<div id="page-words" class="page">
+  <div style="margin-bottom:14px">
+    <input type="text" id="words-search" placeholder="🔍 단어 검색..." autocomplete="off" autocorrect="off" autocapitalize="off" oninput="renderWords()">
+  </div>
+  <div id="words-container"></div>
+</div>
 
 <!-- WRONG -->
 <div id="page-wrong" class="page"><div id="wrong-container"></div></div>
@@ -268,7 +273,7 @@ const COMPLETE_THRESHOLD = 10;
 function getWordWeight(word) {
   const wrong = word.wrongCount || 0;
   const seen = word.seenCount || 0;
-  return (wrong + 1) / (seen + 1);
+  return (wrong + 1) / (seen * 2 + 1);
 }
 
 function isCompleted(word) {
@@ -624,10 +629,19 @@ async function skipQuiz() {
 
 // ── Word List ──
 async function renderWords() {
-  const words=await loadWords();
+  let words=await loadWords();
   const container=document.getElementById('words-container');
-  if (!words.length) { container.innerHTML='<div class="empty">저장된 단어가 없어요</div>'; return; }
-  container.innerHTML=`<div class="section-title">${words.length}개 단어</div>`+
+  const query=(document.getElementById('words-search')?.value||'').trim().toLowerCase();
+  if (query) {
+    words = words.filter(w => w.word.toLowerCase().includes(query) || w.meaning_ko.toLowerCase().includes(query));
+  }
+  if (!words.length) {
+    container.innerHTML = query
+      ? `<div class="empty">"${query}"에 대한 검색 결과가 없어요</div>`
+      : '<div class="empty">저장된 단어가 없어요</div>';
+    return;
+  }
+  container.innerHTML=`<div class="section-title">${words.length}개 단어${query?` (검색: "${query}")`:''}</div>`+
     words.map(w=>{
       const wc=w.wrongCount||0, isDanger=wc>=5;
       const completed=isCompleted(w);
