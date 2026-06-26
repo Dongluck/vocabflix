@@ -169,7 +169,7 @@ input[type="text"]::placeholder { color: #444; }
   <button class="active" id="nav-add" onclick="showPage('add',this)">➕ 추가</button>
   <button id="nav-quiz" onclick="showPage('quiz',this)">🎯 퀴즈</button>
   <button id="nav-words" onclick="showPage('words',this)">📚 단어장</button>
-  <button id="nav-wrong" onclick="showPage('wrong',this)">❌ 오답<span class="nav-badge" id="wrong-badge" style="display:none"></span></button>
+  <button id="nav-wrong" onclick="showPage('wrong',this)">❌ 오답</button>
   <button id="nav-settings" onclick="showPage('settings',this)">⚙️ 설정</button>
 </nav>
 
@@ -271,9 +271,8 @@ const loadWords = async () => (await dbGetAll()).sort((a,b)=>b.addedAt-a.addedAt
 const COMPLETE_THRESHOLD = 10;
 
 function getWordWeight(word) {
-  const wrong = word.wrongCount || 0;
   const seen = word.seenCount || 0;
-  return (wrong + 1) / (seen * 2 + 1);
+  return 1 / (seen * 2 + 1);
 }
 
 function isCompleted(word) {
@@ -388,8 +387,6 @@ async function updateStats() {
   document.getElementById('s-due').textContent=actualQuiz;
   document.getElementById('s-wrong').textContent=wrongWords.length;
   document.getElementById('s-done').textContent=done.length;
-  const wb=document.getElementById('wrong-badge');
-  wb.textContent=wrongWords.length; wb.style.display=wrongWords.length?'inline-block':'none';
 }
 
 async function renderRecent() {
